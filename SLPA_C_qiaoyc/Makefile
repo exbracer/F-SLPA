@@ -34,7 +34,7 @@ classSLPA.o: SLPA.cpp
 Net.o: Net.cpp
 	$(CC) $(CFLAGS) Net.cpp
 
-N`ODE.o: NODE.cpp
+NODE.o: NODE.cpp
 	$(CC) $(CFLAGS) NODE.cpp
 
 CommonFuns.o: CommonFuns.cpp
