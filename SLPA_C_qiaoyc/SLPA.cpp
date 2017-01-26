@@ -237,7 +237,7 @@ void SLPA::start_time(){
 			{
 				GLPA_asyn_pointer();
 			}
-			else if (versioin == 12)
+			else if (version == 12)
 			{
 				GLPA_asyn_pointer_time();
 			}
@@ -326,7 +326,7 @@ void SLPA::start_qiao_v1(){
 			{
 				GLPA_asyn_pointer_qiao_v1();
 			}
-			else (versioin == 22)
+			else if(version == 22)
 			{
 				GLPA_asyn_pointer_qiao_v2();
 			}
