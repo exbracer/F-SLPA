@@ -458,7 +458,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v1(){
 			NODE *v, *nbv;
 			map<int, int> nbWs;
 
-			#pragma omp for schedule(dynamic) 
+			#pragma omp for schedule(dynamic) private(v, nbv, nbWs) 
 			for(int i=0;i<net->N;i++)
 			{
 				v=net->NODES[i];
@@ -479,16 +479,21 @@ void SLPA::GLPA_asyn_pointer_qiao_v1(){
 
 				//c. update the WQ **IMMEDIATELY**
 				// v->WQueue.push_back(label);
-				v->WQueue.push_back(labels[i]);
+				/*
+				#pragma omp critical
+				{
+					v->WQueue.push_back(labels[i]);
+				}
+				*/
 			}
-			/*
-			#pragma omp for schedule(static) 
+			/*	
+			#pragma omp for schedule(static) private(v) 
 			for (int i = 0; i < net->N; i ++)
 			{
 				v = net->NODES[i];
 				v->WQueue.push_back(labels[i]);
 			}
-			*/
+			*/	
 		}
 		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
 	}
