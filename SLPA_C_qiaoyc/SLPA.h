@@ -18,7 +18,7 @@
 #include <vector>
 #include <utility>
 #include <tr1/unordered_map>
-
+#include <unordered_map>
 #include "MersenneTwister.h"
 
 
@@ -88,7 +88,7 @@ public:
 	void post_createWQHistogram_MapEntryList();
 	void post_thresholding(vector<pair<int,int> >& pairList, int thrc, vector<int>& WS);
 
-	int selectMostFrequentLabel(map<int, int>& labelsList);
+	int selectMostFrequentLabel(unordered_map<int, int>& labelsList);
 
 	//need to change
 	//vector<vector<int> > post_sameLabelDisconnectedComponents(vector<vector<int> >& cpm);

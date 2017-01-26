@@ -632,7 +632,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v2(){
 		#pragma omp parallel num_threads(numThreads) 
 		{
 			NODE *v, *nbv;
-			map<int, int> nbWs;
+			unordered_map<int, int> nbWs;
 
 			#pragma omp for schedule(dynamic) private(v, nbv, nbWs) 
 			for(int i=0;i<net->N;i++)

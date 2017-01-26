@@ -10,7 +10,7 @@ CC=g++ # general version
 
 # compiling options flags
 #CFLAGS=-c -O3 -fopenmp
-CFLAGS=-c -O3 -fopenmp -ggdb
+CFLAGS=-c -O3 -fopenmp -ggdb -std=c++0x
 #CFLAGS=-c -Wall
 #CFLAGS= -rdynamic -g -pg -c 
 #CFLAGS= -static -g -pg -c 
