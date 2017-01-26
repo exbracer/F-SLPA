@@ -413,7 +413,7 @@ void SLPA::GLPA_asyn_pointer(){
 		//1.shuffle
 		//cout<<"-------------t="<<t<<"---------------------"<<endl;
 		cout<<"*"<<flush;
-		srand (time(NULL)); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
+		srand (time(19920403)); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
 		random_shuffle (net->NODES.begin(), net->NODES.end());
 		//net->showVertices();
 
@@ -439,6 +439,13 @@ void SLPA::GLPA_asyn_pointer(){
 
 		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
 	}
+	v = net->NODES[43];
+	cout << endl;
+	for (int i = 0; i < v->WQueue.size(); i ++)
+	{
+		cout << v->WQueue[i] << ' ';
+	}
+	cout << endl;
 
 	cout<<endl;
 	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
@@ -448,7 +455,7 @@ void SLPA::GLPA_asyn_pointer_time(){
 	//pointer version:
 	//	 store the pointer of nb in *nbList_P*
 	//   save time for retrieving hashTable
-	time_t st=time(NULL);
+	time_t st=time(19920403);
 
 	NODE *v,*nbv;
 	int label;
@@ -489,6 +496,7 @@ void SLPA::GLPA_asyn_pointer_time(){
 		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
 	}
 	v = net->NODES[43];
+	cout << endl;
 	for (int i = 0; i < v->WQueue.size(); i ++)
 	{
 		cout << v->WQueue[i] << ' ';
@@ -552,6 +560,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v1(){
 		}
 	}
 	v = net->NODES[43];
+	cout << endl;
 	for (int i = 0; i < v->WQueue.size(); i ++)
 	{
 		cout << v->WQueue[i] << ' ';
