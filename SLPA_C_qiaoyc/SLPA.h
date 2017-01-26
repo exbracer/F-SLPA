@@ -68,6 +68,7 @@ public:
 	MTRand mtrand2;
 
 	SLPA(string, vector<double>,int ,int ,string ,bool,int );
+	SLPA(string, vector<double>, int, int, string, bool, int, int);
 	virtual ~SLPA();
 
 	void start();

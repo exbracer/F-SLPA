@@ -38,6 +38,7 @@ map<string,string> readinParameter(int argc,char* argv[]){
 	usage+= "  -r a specific threshold in [0,0.5)\n";
 	usage+= "  -ov set to 0 to perform disjoint detection\n";
 	usage+= "  -M the number of threads(for multi-threading)\n";
+	usage+= "  -v the number of different version\n";
 	usage+= "more parameters refer to Readme.txt\n";
 	//cout<<usage<<endl;
 
@@ -75,7 +76,7 @@ map<string,string> readinParameter(int argc,char* argv[]){
 	return argTable;
 }
 
-void assignParameter(map<string,string>& argTable,int& maxT,bool& isUseLargestComp,bool& isOverlapping,int& maxRun,vector<double>& THRS,string& inputFileName,string& outputDir,int& numThreads){
+void assignParameter(map<string,string>& argTable,int& maxT,bool& isUseLargestComp,bool& isOverlapping,int& maxRun,vector<double>& THRS,string& inputFileName,string& outputDir,int& numThreads, int& version){
 	string key,v;
 
 	map<string,string>::iterator mit;
@@ -142,6 +143,11 @@ void assignParameter(map<string,string>& argTable,int& maxT,bool& isUseLargestCo
 			isUseLargestComp=true;
 	}
 
+	key="-v";
+	if(argTable.count(key)>0){
+		v=argTable.find(key)->second;
+		version = atoi(v.c_str());
+	}
 }
 
 void pre_load_THRS(vector<double> & THRS){
@@ -183,12 +189,12 @@ int main(int argc, char* argv[]) {
 
 
 	int numThreads=0;   //0-single thread;
-
+	int version = 0;
 	//----------------------------------------
 	//			Read in parameter
 	//----------------------------------------
 	map<string,string> argTable=readinParameter(argc,argv);
-	assignParameter(argTable,maxT,isUseLargestComp,isOverlapping,maxRun,THRS,inputFileName,outputDir,numThreads);
+	assignParameter(argTable,maxT,isUseLargestComp,isOverlapping,maxRun,THRS,inputFileName,outputDir,numThreads, version);
 
 	//----------------------------------------
 	//			SLPA
@@ -199,7 +205,7 @@ int main(int argc, char* argv[]) {
 	}else{
 		time_t st=time(NULL);
 
-		SLPA slpa(inputFileName,THRS,maxRun,maxT,outputDir,isUseLargestComp,numThreads);
+		SLPA slpa(inputFileName,THRS,maxRun,maxT,outputDir,isUseLargestComp,numThreads, version);
 
 		cout<<"Running Time is :" <<difftime(time(NULL),st)<< " seconds."<<endl;
 	}

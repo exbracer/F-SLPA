@@ -56,6 +56,50 @@ SLPA::SLPA(string inputFileName,vector<double> THRS,int maxRun,int maxT,string o
 
 	this->numThreads=numThreads;
 
+
+
+	start();
+}
+
+
+SLPA::SLPA(string inputFileName,vector<double> THRS,int maxRun,int maxT,string outputDir,bool isUseLargestComp,int numThreads, int version) {
+	//inputFileName: the full path
+	//netName: short filename(non-suf)
+
+	//---------------------------
+	// set mtrand with stable time seed
+	//---------------------------
+	mtrand1 = MTRand(2010011248);
+	mtrand2 = MTRand(2014210880);
+
+	//---------------------------
+	//Extract the fileName
+	//---------------------------
+	string a,b;
+	fileName_net=inputFileName;
+	extractFileName_FullPath(inputFileName,netName,a,b);
+
+	networkPath="";
+	net=new Net(networkPath,netName,fileName_net);
+
+	//---------------------------
+	//		GLPA parameters
+	//---------------------------
+	for(int i=0;i<THRS.size();i++)
+		this->THRS.push_back(THRS[i]);   //why can not use [i]=.../???
+
+	this->maxRun=maxRun;
+	this->maxT=maxT;
+
+	isSyn=false;
+	this->isUseLargestComp=isUseLargestComp;
+	//---------------------------
+	//		more
+	//---------------------------
+	this->outputDir=outputDir;
+
+	this->numThreads=numThreads;
+
 	this->version = version;
 
 
@@ -411,6 +455,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v1(){
 
 		#pragma omp parallel num_threads(numThreads) 
 		{
+			cout << "numer of threads is" << omp_get_num_threads() << endl;
 			NODE *v, *nbv;
 			map<int, int> nbWs;
 
