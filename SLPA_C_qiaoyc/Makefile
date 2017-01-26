@@ -22,7 +22,7 @@ LDFLAGS=
 TC_LDFLAGS=
 TC_LDFLAGS+= -ltcmalloc -L $(GPERF_LIB_LOCATION) -Wl,-R$(GPERF_LIB_LOCATION)
 
-all: main_SLPA, main_SLPA_tc
+all: main_SLPA main_SLPA_tc
 
 #multi-thread
 main_SLPA: main_SLPA.o classSLPA.o Net.o NODE.o CommonFuns.o fileOpts.o rndNumbers.o
