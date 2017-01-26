@@ -9,7 +9,8 @@ CC=g++ # general version
 #CC=/usr/local/bin/g++-6
 
 # compiling options flags
-CFLAGS=-c -O3 -fopenmp
+#CFLAGS=-c -O3 -fopenmp
+CFLAGS=-c -O3 -fopenmp -ggdb
 #CFLAGS=-c -Wall
 #CFLAGS= -rdynamic -g -pg -c 
 #CFLAGS= -static -g -pg -c 
