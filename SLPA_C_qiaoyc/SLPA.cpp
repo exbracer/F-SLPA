@@ -485,7 +485,15 @@ void SLPA::GLPA_asyn_pointer_time(){
 				nbv=v->nbList_P[j];
 				nbWs.push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
 			}
-
+			if (i == 43 && t == 1)
+			{
+				cout << endl << "neighbours are " << endl;
+				for (int ii = 0; ii < nbWs.size(); ii ++)
+				{
+					cout << nbWs[i] << ' ';
+				}
+				cout << endl;
+			}
 			//b.select one of the most frequent label
 			label=ceateHistogram_selRandMax(nbWs);
 
@@ -547,7 +555,15 @@ void SLPA::GLPA_asyn_pointer_qiao_v1(){
 				// nbWs.push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);	
 				nbWs[nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]] += 1;
 			}
-
+			if (i == 43 && t == 1)
+			{
+				cout << endl << "neighbours are " << endl;
+				for (auto ii = nbWs.begin(); ii != nbWs.end(); ii ++)
+				{
+					cout << ii->first << ' ' << ii->second << endl;
+				}
+				cout << endl;
+			}
 			//b.select one of the most frequent label
 			// label=ceateHistogram_selRandMax(nbWs);
 			labels[i] = selectMostFrequentLabel(nbWs);
@@ -617,6 +633,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v2(){
 					// nbWs.push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
 					
 					nbWs[nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]] += 1;
+
 				}
 
 				//b.select one of the most frequent label
