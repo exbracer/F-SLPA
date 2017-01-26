@@ -46,7 +46,7 @@ map<string,string> readinParameter(int argc,char* argv[]){
 		string arg(argv[i]);
 		string val(argv[i+1]); //**
 
-		if(arg.compare("-t")==0 || arg.compare("-ov")==0 || arg.compare("-r")==0 || arg.compare("-run")==0 || arg.compare("-i")==0 || arg.compare("-d")==0  || arg.compare("-L")==0  || arg.compare("-M")==0){
+		if(arg.compare("-t")==0 || arg.compare("-ov")==0 || arg.compare("-r")==0 || arg.compare("-run")==0 || arg.compare("-i")==0 || arg.compare("-d")==0  || arg.compare("-L")==0  || arg.compare("-M")==0 || arg.compare("-v")==0){
 			if(val.compare(0,1,"-")!=0){
 				argTable.insert(pair<string,string>(arg,val));
 				i++;continue;
@@ -188,7 +188,7 @@ int main(int argc, char* argv[]) {
 	pre_load_THRS(THRS);
 
 
-	int numThreads=0;   //0-single thread;
+	int numThreads=1;   //0-single thread;
 	int version = 0;
 	//----------------------------------------
 	//			Read in parameter

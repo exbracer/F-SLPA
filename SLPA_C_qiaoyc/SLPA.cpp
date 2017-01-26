@@ -455,7 +455,6 @@ void SLPA::GLPA_asyn_pointer_qiao_v1(){
 
 		#pragma omp parallel num_threads(numThreads) 
 		{
-			cout << "numer of threads is" << omp_get_num_threads() << endl;
 			NODE *v, *nbv;
 			map<int, int> nbWs;
 

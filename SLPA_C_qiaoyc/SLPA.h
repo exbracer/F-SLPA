@@ -58,7 +58,7 @@ public:
 	bool isSyn;  			  //is synchronous version?
 	int maxT;
 	int maxRun;
-	int versioin;
+	int version;
 	//---------------------------
 	//		more
 	//---------------------------
