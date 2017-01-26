@@ -17,6 +17,7 @@
 #include "fileOpts.h"
 
 #include <pthread.h>
+#include <omp.h>
 #include <sys/time.h>
 
 typedef std::tr1::unordered_map<int, int> UOrderedH_INT_INT;
@@ -55,11 +56,21 @@ SLPA::SLPA(string inputFileName,vector<double> THRS,int maxRun,int maxT,string o
 
 	this->numThreads=numThreads;
 
+	this->version = version;
 
 
-	// start();
-	start_time(); // instrument time recorder into the original code
-	// start_qiao_v1(); // modified version by qiao_yuchen
+	if (version == 0)
+	{
+		start();
+	}
+	else if (version == 1)
+	{
+		start_time(); // instrument time recorder into the original code
+	}
+	else if (version == 2)
+	{
+		start_qiao_v1(); // modified version by qiao_yuchen
+	}
 }
 
 SLPA::~SLPA() {
@@ -414,7 +425,8 @@ void SLPA::GLPA_asyn_pointer_qiao_v1(){
 				{
 					nbv=v->nbList_P[j];
 					// nbWs.push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
-					nbWs[nbv] += 1;
+					
+					nbWs[nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]] += 1;
 				}
 
 				//b.select one of the most frequent label
@@ -423,13 +435,16 @@ void SLPA::GLPA_asyn_pointer_qiao_v1(){
 
 				//c. update the WQ **IMMEDIATELY**
 				// v->WQueue.push_back(label);
-				// v->WQueue.push_back(labels[i]);
-			}
-			#pragma omp for schedule() shared(labels)
-			for (int i = 0; i < net->N; i ++)
-			{
 				v->WQueue.push_back(labels[i]);
 			}
+			/*
+			#pragma omp for schedule(static) 
+			for (int i = 0; i < net->N; i ++)
+			{
+				v = net->NODES[i];
+				v->WQueue.push_back(labels[i]);
+			}
+			*/
 		}
 		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
 	}
@@ -438,11 +453,11 @@ void SLPA::GLPA_asyn_pointer_qiao_v1(){
 	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
 }
 
-int SLPA::selectMostFrequentLabel(map<int, int>& labesList)
+int SLPA::selectMostFrequentLabel(map<int, int>& labelsList)
 {
 	int label;
 	int maximum = 0;
-	vector<int> mostLabelsList
+	vector<int> mostLabelsList;
 	map<int, int>::iterator mit;
 
 	for (mit = labelsList.begin(); mit != labelsList.end(); mit ++)

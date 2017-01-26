@@ -58,7 +58,7 @@ public:
 	bool isSyn;  			  //is synchronous version?
 	int maxT;
 	int maxRun;
-
+	int versioin;
 	//---------------------------
 	//		more
 	//---------------------------
@@ -84,6 +84,8 @@ public:
 	int ceateHistogram_selRandMax(const vector<int>& wordsList);
 	void post_createWQHistogram_MapEntryList();
 	void post_thresholding(vector<pair<int,int> >& pairList, int thrc, vector<int>& WS);
+
+	int selectMostFrequentLabel(map<int, int>& labelsList);
 
 	//need to change
 	//vector<vector<int> > post_sameLabelDisconnectedComponents(vector<vector<int> >& cpm);

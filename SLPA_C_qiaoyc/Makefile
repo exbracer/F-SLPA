@@ -4,7 +4,7 @@
 CC=g++ # general version
 #CC=/usr/local/bin/g++-6
 #CFLAGS=-c -Wall
-CFLAGS=-c -O3
+CFLAGS=-c -O3 -fopenmp
 #CFLAGS= -rdynamic -g -pg -c 
 #CFLAGS= -static -g -pg -c 
 #CFLAGS= -g -pg -c 
@@ -14,7 +14,7 @@ all: main_SLPA
 
 #multi-thread
 main_SLPA: main_SLPA.o classSLPA.o Net.o NODE.o CommonFuns.o fileOpts.o rndNumbers.o
-	$(CC) main_SLPA.o classSLPA.o Net.o NODE.o CommonFuns.o fileOpts.o rndNumbers.o -o SLPA -pthread
+	$(CC) main_SLPA.o classSLPA.o Net.o NODE.o CommonFuns.o fileOpts.o rndNumbers.o -o SLPA -pthread -fopenmp
 
 #Normal
 #main_SLPA: main_SLPA.o classSLPA.o Net.o NODE.o CommonFuns.o fileOpts.o rndNumbers.o
