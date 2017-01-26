@@ -224,7 +224,7 @@ void SLPA::start_time(){
 		initWQueue_more();
 		gettimeofday(&end, NULL);
 
-		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000;
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000000;
 		cout << "time used for part-1 is " << time_used << " s." << endl;
 
 		//2.GLPA
@@ -243,15 +243,17 @@ void SLPA::start_time(){
 			}
 		}
 		gettimeofday(&end, NULL);
-		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000;
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000000;
 		cout << "time used for part-2 is " << time_used << " s." << endl;
+
+		return; // for quick test
 
 		//3.threshould and post-processing
 		//a. create WQhistogram
 		gettimeofday(&start, NULL);
 		post_createWQHistogram_MapEntryList();
 		gettimeofday(&end, NULL);
-		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000;
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000000;
 		cout << "time used for part-3.a is " << time_used << " s." << endl;
 
 		//b. thresholding and output cpm
@@ -270,7 +272,7 @@ void SLPA::start_time(){
 			//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
 		}
 		gettimeofday(&end, NULL);
-		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000;
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000000;
 		cout << "time used for part-3.b is " << time_used << " s." << endl;
 	}
 }
@@ -312,7 +314,7 @@ void SLPA::start_qiao_v1(){
 		initWQueue_more();
 		gettimeofday(&end, NULL);
 
-		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000;
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000000;
 		cout << "time used for part-1 is " << time_used << " s." << endl;
 
 		//2.GLPA
@@ -333,15 +335,17 @@ void SLPA::start_qiao_v1(){
 			
 		}
 		gettimeofday(&end, NULL);
-		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000;
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000000;
 		cout << "time used for part-2 is " << time_used << " s." << endl;
+
+		return; // for quick test
 
 		//3.threshould and post-processing
 		//a. create WQhistogram
 		gettimeofday(&start, NULL);
 		post_createWQHistogram_MapEntryList();
 		gettimeofday(&end, NULL);
-		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000;
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000000;
 		cout << "time used for part-3.a is " << time_used << " s." << endl;
 
 		//b. thresholding and output cpm
@@ -484,6 +488,12 @@ void SLPA::GLPA_asyn_pointer_time(){
 
 		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
 	}
+	v = net->NODES[43];
+	for (int i = 0; i < v->WQueue.size(); i ++)
+	{
+		cout << v->WQueue[i] << ' ';
+	}
+	cout << endl;
 
 	cout<<endl;
 	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
@@ -541,6 +551,12 @@ void SLPA::GLPA_asyn_pointer_qiao_v1(){
 			
 		}
 	}
+	v = net->NODES[43];
+	for (int i = 0; i < v->WQueue.size(); i ++)
+	{
+		cout << v->WQueue[i] << ' ';
+	}
+	cout << endl;
 
 	cout<<endl;
 	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
