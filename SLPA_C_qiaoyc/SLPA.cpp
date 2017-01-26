@@ -107,11 +107,11 @@ SLPA::SLPA(string inputFileName,vector<double> THRS,int maxRun,int maxT,string o
 	{
 		start();
 	}
-	else if (version == 1)
+	else if (version < 20)
 	{
 		start_time(); // instrument time recorder into the original code
 	}
-	else if (version == 2)
+	else if (version >= 20)
 	{
 		start_qiao_v1(); // modified version by qiao_yuchen
 	}
@@ -233,7 +233,14 @@ void SLPA::start_time(){
 			//GLPA_syn();
 		}
 		else{
-			GLPA_asyn_pointer();
+			if (version == 11)
+			{
+				GLPA_asyn_pointer();
+			}
+			else if (versioin == 12)
+			{
+				GLPA_asyn_pointer_time();
+			}
 		}
 		gettimeofday(&end, NULL);
 		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000;
@@ -315,7 +322,15 @@ void SLPA::start_qiao_v1(){
 		}
 		else{
 			// GLPA_asyn_pointer();
-			GLPA_asyn_pointer_qiao_v1();
+			if (version == 21)
+			{
+				GLPA_asyn_pointer_qiao_v1();
+			}
+			else (versioin == 22)
+			{
+				GLPA_asyn_pointer_qiao_v2();
+			}
+			
 		}
 		gettimeofday(&end, NULL);
 		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000;
@@ -425,7 +440,113 @@ void SLPA::GLPA_asyn_pointer(){
 	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
 }
 
+void SLPA::GLPA_asyn_pointer_time(){
+	//pointer version:
+	//	 store the pointer of nb in *nbList_P*
+	//   save time for retrieving hashTable
+	time_t st=time(NULL);
+
+	NODE *v,*nbv;
+	int label;
+	vector<int> nbWs;
+	map<int,NODE *>::iterator mit;
+
+	//t=1 because we initialize the WQ(t=0)
+	cout<<"Start iteration:";
+
+	for(int t=1;t<maxT;t++){
+		//1.shuffle
+		//cout<<"-------------t="<<t<<"---------------------"<<endl;
+		cout<<"*"<<flush;
+		srand (time(NULL)); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
+		random_shuffle (net->NODES.begin(), net->NODES.end());
+		//net->showVertices();
+
+
+		//2. do one iteration-asyn
+		for(int i=0;i<net->N;i++){
+			v=net->NODES[i];
+
+			//a.collect labels from nbs
+			nbWs.clear();
+
+			for(int j=0;j<v->numNbs;j++){
+				nbv=v->nbList_P[j];
+				nbWs.push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
+			}
+
+			//b.select one of the most frequent label
+			label=ceateHistogram_selRandMax(nbWs);
+
+			//c. update the WQ **IMMEDIATELY**
+			v->WQueue.push_back(label);
+		}
+
+		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
+	}
+
+	cout<<endl;
+	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
+}
+
 void SLPA::GLPA_asyn_pointer_qiao_v1(){
+	//pointer version:
+	//	 store the pointer of nb in *nbList_P*
+	//   save time for retrieving hashTable
+	time_t st=time(NULL);
+
+	NODE *v,*nbv;
+	map<int, int> nbWs;
+	// int label;
+
+	int labels[net->N];
+	
+	map<int,NODE *>::iterator mit;
+
+	//t=1 because we initialize the WQ(t=0)
+	cout<<"Start iteration:";
+
+	for(int t=1;t<maxT;t++){
+		//1.shuffle
+		//cout<<"-------------t="<<t<<"---------------------"<<endl;
+		cout<<"*"<<flush;
+		// srand (time(NULL)); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
+		srand(19920403);
+		random_shuffle (net->NODES.begin(), net->NODES.end());
+		//net->showVertices();
+
+
+		//2. do one iteration-asyn
+		for(int i=0;i<net->N;i++)
+		{
+			v=net->NODES[i];
+			//a.collect labels from nbs
+			nbWs.clear();
+
+			for(int j=0;j<v->numNbs;j++)
+			{
+				nbv=v->nbList_P[j];
+				// nbWs.push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);	
+				nbWs[nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]] += 1;
+			}
+
+			//b.select one of the most frequent label
+			// label=ceateHistogram_selRandMax(nbWs);
+			labels[i] = selectMostFrequentLabel(nbWs);
+
+			//c. update the WQ **IMMEDIATELY**
+			// v->WQueue.push_back(label);
+				
+			v->WQueue.push_back(labels[i]);
+			
+		}
+	}
+
+	cout<<endl;
+	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
+}
+
+void SLPA::GLPA_asyn_pointer_qiao_v2(){
 	//pointer version:
 	//	 store the pointer of nb in *nbList_P*
 	//   save time for retrieving hashTable

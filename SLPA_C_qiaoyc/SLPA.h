@@ -79,8 +79,10 @@ public:
 	void initWQueue_more();
 
 	//void GLPA_asyn();
-	void GLPA_asyn_pointer();
+	void GLPA_asyn_pointer(); // the original version
+	void GLPA_asyn_pointer_time(); // intrument time recoder into the original code
 	void GLPA_asyn_pointer_qiao_v1(); // modified version by qiao_yuchen
+	void GLPA_asyn_pointer_qiao_v2(); // modified version by qiao_yuchen with openmp
 
 	int ceateHistogram_selRandMax(const vector<int>& wordsList);
 	void post_createWQHistogram_MapEntryList();
