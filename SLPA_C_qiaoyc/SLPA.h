@@ -71,11 +71,15 @@ public:
 	virtual ~SLPA();
 
 	void start();
+	void start_time(); // instrument time recorder into the original code
+	void start_qiao_v1(); // modified version by qiao_yuchen
+
 	void pre_initial_THRCS();
 	void initWQueue_more();
 
 	//void GLPA_asyn();
 	void GLPA_asyn_pointer();
+	void GLPA_asyn_pointer_qiao_v1(); // modified version by qiao_yuchen
 
 	int ceateHistogram_selRandMax(const vector<int>& wordsList);
 	void post_createWQHistogram_MapEntryList();

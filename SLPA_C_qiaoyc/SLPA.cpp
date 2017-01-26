@@ -17,7 +17,7 @@
 #include "fileOpts.h"
 
 #include <pthread.h>
-
+#include <sys/time.h>
 
 typedef std::tr1::unordered_map<int, int> UOrderedH_INT_INT;
 
@@ -57,7 +57,9 @@ SLPA::SLPA(string inputFileName,vector<double> THRS,int maxRun,int maxT,string o
 
 
 
-	start();
+	// start();
+	start_time(); // instrument time recorder into the original code
+	// start_qiao_v1(); // modified version by qiao_yuchen
 }
 
 SLPA::~SLPA() {
@@ -127,6 +129,169 @@ void SLPA::start(){
 
 			//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
 		}
+	}
+}
+
+void SLPA::start_time(){
+	//---------------------------
+	//  load network
+	//---------------------------
+	bool isSymmetrize=true; //symmetrize the edges
+
+	net->readNetwork_EdgesList(fileName_net,isUseLargestComp,isSymmetrize);
+	cout<<"Network info: N="<<net->N<< " M="<<net->M<<"(symmetric)"<<endl;
+	cout<<"load "<<fileName_net<< " done.."<<endl;
+
+	//net.showVertices();
+	//net->showVertices_Table();
+
+	//---------------------------
+	//  convert thr to count_thr
+	//---------------------------
+	pre_initial_THRCS();
+
+	//---------------------------
+	// time recorder
+	//---------------------------
+	struct timeval start, end;
+	double time_used;
+
+	//---------------------------
+	//  	game
+	//---------------------------
+	for(int run=1;run<=maxRun;run++){
+		//if(isDEBUG)
+		cout<<" run="<<run<<"......"<<endl;
+
+
+		//1.initial WQ and clear network
+		gettimeofday(&start, NULL);
+		initWQueue_more();
+		gettimeofday(&end, NULL);
+
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000;
+		cout << "time used for part-1 is " << time_used << " s." << endl;
+
+		//2.GLPA
+		gettimeofday(&start, NULL);
+		if(isSyn){
+			//GLPA_syn();
+		}
+		else{
+			GLPA_asyn_pointer();
+		}
+		gettimeofday(&end, NULL);
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000;
+		cout << "time used for part-2 is " << time_used << " s." << endl;
+
+		//3.threshould and post-processing
+		//a. create WQhistogram
+		gettimeofday(&start, NULL);
+		post_createWQHistogram_MapEntryList();
+		gettimeofday(&end, NULL);
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000;
+		cout << "time used for part-3.a is " << time_used << " s." << endl;
+
+		//b. thresholding and output cpm
+		gettimeofday(&start, NULL);
+		for(int i=0;i<THRCS.size();i++){
+			int thrc=THRCS[i];
+			double thrp=THRS[i];
+
+			time_t st=time(NULL);
+			cout<<"Progress: Thresholding thr="<<thrp<<"......."<<endl;
+			string fileName=outputDir+"SLPA_"+netName+"_run"+int2str(run)+"_r"+dbl2str(thrp)+ ".icpm";
+
+			if(isDEBUG) cout<<"cpm="<<fileName<<endl;
+			post_threshold_createCPM_pointer(thrc,fileName);
+
+			//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
+		}
+		gettimeofday(&end, NULL);
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000;
+		cout << "time used for part-3.b is " << time_used << " s." << endl;
+	}
+}
+
+void SLPA::start_qiao_v1(){
+	//---------------------------
+	//  load network
+	//---------------------------
+	bool isSymmetrize=true; //symmetrize the edges
+
+	net->readNetwork_EdgesList(fileName_net,isUseLargestComp,isSymmetrize);
+	cout<<"Network info: N="<<net->N<< " M="<<net->M<<"(symmetric)"<<endl;
+	cout<<"load "<<fileName_net<< " done.."<<endl;
+
+	//net.showVertices();
+	//net->showVertices_Table();
+
+	//---------------------------
+	//  convert thr to count_thr
+	//---------------------------
+	pre_initial_THRCS();
+
+	//---------------------------
+	// time recorder
+	//---------------------------
+	struct timeval start, end;
+	double time_used;
+
+	//---------------------------
+	//  	game
+	//---------------------------
+	for(int run=1;run<=maxRun;run++){
+		//if(isDEBUG)
+		cout<<" run="<<run<<"......"<<endl;
+
+
+		//1.initial WQ and clear network
+		gettimeofday(&start, NULL);
+		initWQueue_more();
+		gettimeofday(&end, NULL);
+
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000;
+		cout << "time used for part-1 is " << time_used << " s." << endl;
+
+		//2.GLPA
+		gettimeofday(&start, NULL);
+		if(isSyn){
+			//GLPA_syn();
+		}
+		else{
+			// GLPA_asyn_pointer();
+			GLPA_asyn_pointer_qiao_v1();
+		}
+		gettimeofday(&end, NULL);
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000;
+		cout << "time used for part-2 is " << time_used << " s." << endl;
+
+		//3.threshould and post-processing
+		//a. create WQhistogram
+		gettimeofday(&start, NULL);
+		post_createWQHistogram_MapEntryList();
+		gettimeofday(&end, NULL);
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000;
+		cout << "time used for part-3.a is " << time_used << " s." << endl;
+
+		//b. thresholding and output cpm
+		gettimeofday(&start, NULL);
+		for(int i=0;i<THRCS.size();i++){
+			int thrc=THRCS[i];
+			double thrp=THRS[i];
+
+			time_t st=time(NULL);
+			cout<<"Progress: Thresholding thr="<<thrp<<"......."<<endl;
+			string fileName=outputDir+"SLPA_"+netName+"_run"+int2str(run)+"_r"+dbl2str(thrp)+ ".icpm";
+
+			if(isDEBUG) cout<<"cpm="<<fileName<<endl;
+			post_threshold_createCPM_pointer(thrc,fileName);
+
+			//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
+		}
+		gettimeofday(&end, NULL);
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000;
+		cout << "time used for part-3.b is " << time_used << " s." << endl;
 	}
 }
 
@@ -203,6 +368,112 @@ void SLPA::GLPA_asyn_pointer(){
 
 	cout<<endl;
 	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
+}
+
+void SLPA::GLPA_asyn_pointer_qiao_v1(){
+	//pointer version:
+	//	 store the pointer of nb in *nbList_P*
+	//   save time for retrieving hashTable
+	time_t st=time(NULL);
+
+	// NODE *v,*nbv;
+	// int label;
+
+	int labels[net->N];
+	
+	map<int,NODE *>::iterator mit;
+
+	//t=1 because we initialize the WQ(t=0)
+	cout<<"Start iteration:";
+
+	for(int t=1;t<maxT;t++){
+		//1.shuffle
+		//cout<<"-------------t="<<t<<"---------------------"<<endl;
+		cout<<"*"<<flush;
+		// srand (time(NULL)); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
+		srand(19920403);
+		random_shuffle (net->NODES.begin(), net->NODES.end());
+		//net->showVertices();
+
+
+		//2. do one iteration-asyn
+
+		#pragma omp parallel num_threads(numThreads) 
+		{
+			NODE *v, *nbv;
+			map<int, int> nbWs;
+
+			#pragma omp for schedule(dynamic) 
+			for(int i=0;i<net->N;i++)
+			{
+				v=net->NODES[i];
+				//a.collect labels from nbs
+				nbWs.clear();
+
+				for(int j=0;j<v->numNbs;j++)
+				{
+					nbv=v->nbList_P[j];
+					// nbWs.push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
+					nbWs[nbv] += 1;
+				}
+
+				//b.select one of the most frequent label
+				// label=ceateHistogram_selRandMax(nbWs);
+				labels[i] = selectMostFrequentLabel(nbWs);
+
+				//c. update the WQ **IMMEDIATELY**
+				// v->WQueue.push_back(label);
+				// v->WQueue.push_back(labels[i]);
+			}
+			#pragma omp for schedule() shared(labels)
+			for (int i = 0; i < net->N; i ++)
+			{
+				v->WQueue.push_back(labels[i]);
+			}
+		}
+		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
+	}
+
+	cout<<endl;
+	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
+}
+
+int SLPA::selectMostFrequentLabel(map<int, int>& labesList)
+{
+	int label;
+	int maximum = 0;
+	vector<int> mostLabelsList
+	map<int, int>::iterator mit;
+
+	for (mit = labelsList.begin(); mit != labelsList.end(); mit ++)
+	{
+		if (mit->second > maximum)
+		{
+			maximum = mit->second;
+			mostLabelsList.clear();
+			mostLabelsList.push_back(mit->first);
+		}
+		else if (mit->second == maximum)
+		{
+			mostLabelsList.push_back(mit->first);
+		}
+		else
+		{
+			continue;
+		}
+	}
+
+	if (mostLabelsList.size() == 1)
+	{
+		label = mostLabelsList[0];
+	}
+	else
+	{
+		int index = mtrand1.randInt(mostLabelsList.size()-1);
+		label = mostLabelsList[index];
+	}
+
+	return label;
 }
 
 int SLPA::ceateHistogram_selRandMax(const vector<int>& wordsList){
