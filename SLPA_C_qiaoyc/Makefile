@@ -1,24 +1,35 @@
 # modified by Yuchen Qiao
 #
 
+# library path
+GPERF_LIB_LOCATION=~/user/lib
+
+# compiler 
 CC=g++ # general version
 #CC=/usr/local/bin/g++-6
-#CFLAGS=-c -Wall
+
+# compiling options flags
 CFLAGS=-c -O3 -fopenmp
+#CFLAGS=-c -Wall
 #CFLAGS= -rdynamic -g -pg -c 
 #CFLAGS= -static -g -pg -c 
 #CFLAGS= -g -pg -c 
 
-GPERF_LIB_LOCATION=~/user/lib
+# link options flags
+LDFLAGS=
 
+# link for tcmalloc
 TC_LDFLAGS=
 TC_LDFLAGS+= -ltcmalloc -L $(GPERF_LIB_LOCATION) -Wl,-R$(GPERF_LIB_LOCATION)
 
-all: main_SLPA
+all: main_SLPA, main_SLPA_tc
 
 #multi-thread
 main_SLPA: main_SLPA.o classSLPA.o Net.o NODE.o CommonFuns.o fileOpts.o rndNumbers.o
-	$(CC) main_SLPA.o classSLPA.o Net.o NODE.o CommonFuns.o fileOpts.o rndNumbers.o -o SLPA -pthread -fopenmp $(TC_LDFLAGS)
+	$(CC) main_SLPA.o classSLPA.o Net.o NODE.o CommonFuns.o fileOpts.o rndNumbers.o -o SLPA -pthread -fopenmp 
+
+main_SLPA_tc: main_SLPA.o classSLPA.o Net.o NODE.o CommonFuns.o fileOpts.o rndNumbers.o
+	$(CC) main_SLPA.o classSLPA.o Net.o NODE.o CommonFuns.o fileOpts.o rndNumbers.o -o SLPA_tc -pthread -fopenmp $(TC_LDFLAGS)
 
 #Normal
 #main_SLPA: main_SLPA.o classSLPA.o Net.o NODE.o CommonFuns.o fileOpts.o rndNumbers.o
@@ -52,4 +63,4 @@ rndNumbers.o: rndNumbers.cpp
 
 
 clean:
-	rm -rf *o SLPA
+	rm -rf *o SLPA SLPA_tc
