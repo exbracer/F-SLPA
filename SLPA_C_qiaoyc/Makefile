@@ -9,12 +9,16 @@ CFLAGS=-c -O3 -fopenmp
 #CFLAGS= -static -g -pg -c 
 #CFLAGS= -g -pg -c 
 
+GPERF_LIB_LOCATION=~/user/lib
+
+TC_LDFLAGS=
+TC_LDFLAGS+= -ltcmalloc -L $(GPERF_LIB_LOCATION) -Wl,-R$(GPERF_LIB_LOCATION)
 
 all: main_SLPA
 
 #multi-thread
 main_SLPA: main_SLPA.o classSLPA.o Net.o NODE.o CommonFuns.o fileOpts.o rndNumbers.o
-	$(CC) main_SLPA.o classSLPA.o Net.o NODE.o CommonFuns.o fileOpts.o rndNumbers.o -o SLPA -pthread -fopenmp
+	$(CC) main_SLPA.o classSLPA.o Net.o NODE.o CommonFuns.o fileOpts.o rndNumbers.o -o SLPA -pthread -fopenmp $(TC_LDFLAGS)
 
 #Normal
 #main_SLPA: main_SLPA.o classSLPA.o Net.o NODE.o CommonFuns.o fileOpts.o rndNumbers.o
