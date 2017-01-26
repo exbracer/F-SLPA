@@ -413,7 +413,7 @@ void SLPA::GLPA_asyn_pointer(){
 		//1.shuffle
 		//cout<<"-------------t="<<t<<"---------------------"<<endl;
 		cout<<"*"<<flush;
-		srand (time(19920403)); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
+		srand (19920403); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
 		random_shuffle (net->NODES.begin(), net->NODES.end());
 		//net->showVertices();
 
@@ -469,7 +469,7 @@ void SLPA::GLPA_asyn_pointer_time(){
 		//1.shuffle
 		//cout<<"-------------t="<<t<<"---------------------"<<endl;
 		cout<<"*"<<flush;
-		srand (time(19920403)); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
+		srand (19920403); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
 		random_shuffle (net->NODES.begin(), net->NODES.end());
 		//net->showVertices();
 
