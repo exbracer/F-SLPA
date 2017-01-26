@@ -485,6 +485,7 @@ void SLPA::GLPA_asyn_pointer_time(){
 				nbv=v->nbList_P[j];
 				nbWs.push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
 			}
+			/*
 			if (v->WQueue[0] == 27475 && t == 1)
 			{
 				cout << endl << "neighbours are " << endl;
@@ -494,12 +495,15 @@ void SLPA::GLPA_asyn_pointer_time(){
 				}
 				cout << endl;
 			}
+			*/
 			//b.select one of the most frequent label
 			label=ceateHistogram_selRandMax(nbWs);
+			/*
 			if (v->WQueue[0] == 27475 && t == 1)
 			{
 				cout << "label = " << label << endl;
 			}
+			*/
 			//c. update the WQ **IMMEDIATELY**
 			v->WQueue.push_back(label);
 		}
@@ -525,7 +529,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v1(){
 	time_t st=time(NULL);
 
 	NODE *v,*nbv;
-	map<int, int> nbWs;
+	unordered_map<int, int> nbWs;
 	// int label;
 
 	int labels[net->N];
@@ -558,6 +562,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v1(){
 				// nbWs.push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);	
 				nbWs[nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]] += 1;
 			}
+			/*
 			if (v->WQueue[0] == 27475 && t == 1)
 			{
 				cout << endl << "neighbours are " << endl;
@@ -567,13 +572,16 @@ void SLPA::GLPA_asyn_pointer_qiao_v1(){
 				}
 				cout << endl;
 			}
+			*/
 			//b.select one of the most frequent label
 			// label=ceateHistogram_selRandMax(nbWs);
 			labels[i] = selectMostFrequentLabel(nbWs);
+			/*
 			if (v->WQueue[0] == 27475 && t == 1)
 			{
 				cout << "label is " << labels[i] << endl;
 			}
+			*/
 			//c. update the WQ **IMMEDIATELY**
 			// v->WQueue.push_back(label);
 				
@@ -671,12 +679,12 @@ void SLPA::GLPA_asyn_pointer_qiao_v2(){
 	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
 }
 
-int SLPA::selectMostFrequentLabel(map<int, int>& labelsList)
+int SLPA::selectMostFrequentLabel(unordered_map<int, int>& labelsList)
 {
 	int label;
 	int maximum = 0;
 	vector<int> mostLabelsList;
-	map<int, int>::iterator mit;
+	unordered_map<int, int>::iterator mit;
 
 	for (mit = labelsList.begin(); mit != labelsList.end(); mit ++)
 	{
