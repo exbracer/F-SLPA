@@ -1037,13 +1037,15 @@ void SLPA::GLPA_asyn_pointer_omp(){
 
 		#pragma omp parallel num_threads(numThreads) 
 		{
-			int id = omp_get_thread_num();
-			NODE *v, *nbv;
+			// int id = omp_get_thread_num();
+			// NODE *v, *nbv;
 			// vector<int> nbWs;
 
 			#pragma omp for schedule(dynamic) private(v, nbv)
 			for(int i=0;i<net->N;i++)
 			{
+				NODE *v, *nbv;
+				int id = omp_get_thread_num();
 				v=net->NODES[i];
 
 				//a.collect labels from nbs
@@ -1064,7 +1066,7 @@ void SLPA::GLPA_asyn_pointer_omp(){
 			for (int i = 0; i < net->N; i ++)
 			{
 				//c. update the WQ after all in an synchronized way
-				v = net->NODES[i];
+				NODE *v = net->NODES[i];
 				v->WQueue.push_back(labels[i]);
 			}
 		}
