@@ -1152,7 +1152,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v1(){
 	time_t st=time(NULL);
 
 	NODE *v,*nbv;
-	unordered_map<int, int> nbWs;
+	map<int, int> nbWs;
 	// int label;
 
 	int labels[net->N];
