@@ -68,28 +68,20 @@ public:
 	MTRand mtrand2;
 
 	SLPA(string, vector<double>,int ,int ,string ,bool,int );
-	SLPA(string, vector<double>, int, int, string, bool, int, int);
 	virtual ~SLPA();
 
 	void start();
-	void start_time(); // instrument time recorder into the original code
-	void start_qiao_v1(); // modified version by qiao_yuchen
 
 	void pre_initial_THRCS();
 	void initWQueue_more();
 
 	//void GLPA_asyn();
 	void GLPA_asyn_pointer(); // the original version
-	void GLPA_asyn_pointer_time(); // intrument time recoder into the original code
-	void GLPA_asyn_pointer_qiao_v1(); // modified version by qiao_yuchen
-	void GLPA_asyn_pointer_qiao_v2(); // modified version by qiao_yuchen with openmp
+	
 
 	int ceateHistogram_selRandMax(const vector<int>& wordsList);
 	void post_createWQHistogram_MapEntryList();
 	void post_thresholding(vector<pair<int,int> >& pairList, int thrc, vector<int>& WS);
-
-	int selectMostFrequentLabel(unordered_map<int, int>& labelsList);
-	int selectMostFrequentLabel_v2(map<int, int>& labelsList, vector<int>& mostLabelsList);
 
 	//need to change
 	//vector<vector<int> > post_sameLabelDisconnectedComponents(vector<vector<int> >& cpm);
@@ -117,6 +109,23 @@ public:
 	void decomposeTasks(int numTasks,int numThd,int stInds[],int enInds[]);
 	static void *removesubset_onethread(void *threadarg);
 	vector<vector<int>* > post_removeSubset_UorderedHashTable_cpmpointer_MultiThd(vector<vector<int>* >& cpm);
+
+	//---------------------------
+	// code add by qiao_yuchen
+	//---------------------------
+	SLPA(string, vector<double>, int, int, string, bool, int, int); // new construction function
+
+	void start_time(); // instrument time recorder into the original code
+	void start_qiao_v1(); // modified version by qiao_yuchen
+
+	void GLPA_asyn_pointer_omp(); // add openmp on original code, actually it is synchronized version, please nootice that
+	void GLPA_asyn_pointer_time(); // intrument time recoder into the original code
+	void GLPA_asyn_pointer_qiao_v1(); // modified version by qiao_yuchen
+	void GLPA_asyn_pointer_qiao_v2(); // modified version by qiao_yuchen with openmp
+
+	int selectMostFrequentLabel_v1(map<int, int>& labelsList);
+	int selectMostFrequentLabel_v2(map<int, int>& labelsList, vector<int>& mostLabelsList);
+
 };
 
 #endif /* SLPA_H_ */
