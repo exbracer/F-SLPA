@@ -1035,13 +1035,13 @@ void SLPA::GLPA_asyn_pointer_omp(){
 		//2. do one iteration-asyn
 		// modified version: in synchronized way
 
-		#pragma omp parallel num_threads(numThreads) 
-		{
+		// #pragma omp parallel num_threads(numThreads) 
+		// {
 			// int id = omp_get_thread_num();
 			// NODE *v, *nbv;
 			// vector<int> nbWs;
 
-			#pragma omp for schedule(dynamic) 
+			#pragma omp parallel for schedule(dynamic) shared(labels)
 			for(int i=0;i<net->N;i++)
 			{
 				NODE *v, *nbv;
@@ -1062,14 +1062,16 @@ void SLPA::GLPA_asyn_pointer_omp(){
 				//c. update the WQ **IMMEDIATELY**
 				//v->WQueue.push_back(label);
 			}
-			#pragma omp for schedule(static) 
+
+			#pragma omp parallel for schedule(static) 
 			for (int i = 0; i < net->N; i ++)
 			{
 				//c. update the WQ after all in an synchronized way
 				NODE *v = net->NODES[i];
 				v->WQueue.push_back(labels[i]);
 			}
-		}
+		
+		//}
 		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
 	} // end of for(int t=1; t<maxT; t++)
 
