@@ -1041,7 +1041,7 @@ void SLPA::GLPA_asyn_pointer_omp(){
 			// NODE *v, *nbv;
 			// vector<int> nbWs;
 
-			#pragma omp parallel for schedule(dynamic) shared(labels)
+			#pragma omp parallel for schedule(dynamic) shared(labels, nbWs)
 			for(int i=0;i<net->N;i++)
 			{
 				NODE *v, *nbv;
