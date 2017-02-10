@@ -1240,7 +1240,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v2(){
 		#pragma omp parallel num_threads(numThreads) 
 		{
 			NODE *v, *nbv;
-			unordered_map<int, int> nbWs;
+			map<int, int> nbWs;
 
 			#pragma omp for schedule(dynamic) private(v, nbv, nbWs) 
 			for(int i=0;i<net->N;i++)
@@ -1287,7 +1287,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v2(){
 	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
 }
 
-int SLPA::selectMostFrequentLabel(map<int, int>& labelsList)
+int SLPA::selectMostFrequentLabel_v1(map<int, int>& labelsList)
 {
 	int label;
 	int maximum = 0;
