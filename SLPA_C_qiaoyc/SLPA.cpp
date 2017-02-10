@@ -17,8 +17,7 @@
 #include "fileOpts.h"
 
 #include <pthread.h>
-#include <omp.h>
-#include <sys/time.h>
+
 
 typedef std::tr1::unordered_map<int, int> UOrderedH_INT_INT;
 
@@ -59,62 +58,6 @@ SLPA::SLPA(string inputFileName,vector<double> THRS,int maxRun,int maxT,string o
 
 
 	start();
-}
-
-
-SLPA::SLPA(string inputFileName,vector<double> THRS,int maxRun,int maxT,string outputDir,bool isUseLargestComp,int numThreads, int version) {
-	//inputFileName: the full path
-	//netName: short filename(non-suf)
-
-	//---------------------------
-	// set mtrand with stable time seed
-	//---------------------------
-	mtrand1 = MTRand(2010011248);
-	mtrand2 = MTRand(2014210880);
-
-	//---------------------------
-	//Extract the fileName
-	//---------------------------
-	string a,b;
-	fileName_net=inputFileName;
-	extractFileName_FullPath(inputFileName,netName,a,b);
-
-	networkPath="";
-	net=new Net(networkPath,netName,fileName_net);
-
-	//---------------------------
-	//		GLPA parameters
-	//---------------------------
-	for(int i=0;i<THRS.size();i++)
-		this->THRS.push_back(THRS[i]);   //why can not use [i]=.../???
-
-	this->maxRun=maxRun;
-	this->maxT=maxT;
-
-	isSyn=false;
-	this->isUseLargestComp=isUseLargestComp;
-	//---------------------------
-	//		more
-	//---------------------------
-	this->outputDir=outputDir;
-
-	this->numThreads=numThreads;
-
-	this->version = version;
-
-
-	if (version == 0)
-	{
-		start();
-	}
-	else if (version < 20)
-	{
-		start_time(); // instrument time recorder into the original code
-	}
-	else if (version >= 20)
-	{
-		start_qiao_v1(); // modified version by qiao_yuchen
-	}
 }
 
 SLPA::~SLPA() {
@@ -187,188 +130,6 @@ void SLPA::start(){
 	}
 }
 
-void SLPA::start_time(){
-	//---------------------------
-	//  load network
-	//---------------------------
-	bool isSymmetrize=true; //symmetrize the edges
-
-	net->readNetwork_EdgesList(fileName_net,isUseLargestComp,isSymmetrize);
-	cout<<"Network info: N="<<net->N<< " M="<<net->M<<"(symmetric)"<<endl;
-	cout<<"load "<<fileName_net<< " done.."<<endl;
-
-	//net.showVertices();
-	//net->showVertices_Table();
-
-	//---------------------------
-	//  convert thr to count_thr
-	//---------------------------
-	pre_initial_THRCS();
-
-	//---------------------------
-	// time recorder
-	//---------------------------
-	struct timeval start, end;
-	double time_used;
-
-	//---------------------------
-	//  	game
-	//---------------------------
-	for(int run=1;run<=maxRun;run++){
-		//if(isDEBUG)
-		cout<<" run="<<run<<"......"<<endl;
-
-
-		//1.initial WQ and clear network
-		gettimeofday(&start, NULL);
-		initWQueue_more();
-		gettimeofday(&end, NULL);
-
-		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000000;
-		cout << "time used for part-1 is " << time_used << " s." << endl;
-
-		//2.GLPA
-		gettimeofday(&start, NULL);
-		if(isSyn){
-			//GLPA_syn();
-		}
-		else{
-			if (version == 11)
-			{
-				GLPA_asyn_pointer();
-			}
-			else if (version == 12)
-			{
-				GLPA_asyn_pointer_time();
-			}
-		}
-		gettimeofday(&end, NULL);
-		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000000;
-		cout << "time used for part-2 is " << time_used << " s." << endl;
-
-		return; // for quick test
-
-		//3.threshould and post-processing
-		//a. create WQhistogram
-		gettimeofday(&start, NULL);
-		post_createWQHistogram_MapEntryList();
-		gettimeofday(&end, NULL);
-		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000000;
-		cout << "time used for part-3.a is " << time_used << " s." << endl;
-
-		//b. thresholding and output cpm
-		gettimeofday(&start, NULL);
-		for(int i=0;i<THRCS.size();i++){
-			int thrc=THRCS[i];
-			double thrp=THRS[i];
-
-			time_t st=time(NULL);
-			cout<<"Progress: Thresholding thr="<<thrp<<"......."<<endl;
-			string fileName=outputDir+"SLPA_"+netName+"_run"+int2str(run)+"_r"+dbl2str(thrp)+ ".icpm";
-
-			if(isDEBUG) cout<<"cpm="<<fileName<<endl;
-			post_threshold_createCPM_pointer(thrc,fileName);
-
-			//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
-		}
-		gettimeofday(&end, NULL);
-		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000000;
-		cout << "time used for part-3.b is " << time_used << " s." << endl;
-	}
-}
-
-void SLPA::start_qiao_v1(){
-	//---------------------------
-	//  load network
-	//---------------------------
-	bool isSymmetrize=true; //symmetrize the edges
-
-	net->readNetwork_EdgesList(fileName_net,isUseLargestComp,isSymmetrize);
-	cout<<"Network info: N="<<net->N<< " M="<<net->M<<"(symmetric)"<<endl;
-	cout<<"load "<<fileName_net<< " done.."<<endl;
-
-	//net.showVertices();
-	//net->showVertices_Table();
-
-	//---------------------------
-	//  convert thr to count_thr
-	//---------------------------
-	pre_initial_THRCS();
-
-	//---------------------------
-	// time recorder
-	//---------------------------
-	struct timeval start, end;
-	double time_used;
-
-	//---------------------------
-	//  	game
-	//---------------------------
-	for(int run=1;run<=maxRun;run++){
-		//if(isDEBUG)
-		cout<<" run="<<run<<"......"<<endl;
-
-
-		//1.initial WQ and clear network
-		gettimeofday(&start, NULL);
-		initWQueue_more();
-		gettimeofday(&end, NULL);
-
-		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000000;
-		cout << "time used for part-1 is " << time_used << " s." << endl;
-
-		//2.GLPA
-		gettimeofday(&start, NULL);
-		if(isSyn){
-			//GLPA_syn();
-		}
-		else{
-			// GLPA_asyn_pointer();
-			if (version == 21)
-			{
-				GLPA_asyn_pointer_qiao_v1();
-			}
-			else if(version == 22)
-			{
-				GLPA_asyn_pointer_qiao_v2();
-			}
-			
-		}
-		gettimeofday(&end, NULL);
-		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000000;
-		cout << "time used for part-2 is " << time_used << " s." << endl;
-
-		return; // for quick test
-
-		//3.threshould and post-processing
-		//a. create WQhistogram
-		gettimeofday(&start, NULL);
-		post_createWQHistogram_MapEntryList();
-		gettimeofday(&end, NULL);
-		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000000;
-		cout << "time used for part-3.a is " << time_used << " s." << endl;
-
-		//b. thresholding and output cpm
-		gettimeofday(&start, NULL);
-		for(int i=0;i<THRCS.size();i++){
-			int thrc=THRCS[i];
-			double thrp=THRS[i];
-
-			time_t st=time(NULL);
-			cout<<"Progress: Thresholding thr="<<thrp<<"......."<<endl;
-			string fileName=outputDir+"SLPA_"+netName+"_run"+int2str(run)+"_r"+dbl2str(thrp)+ ".icpm";
-
-			if(isDEBUG) cout<<"cpm="<<fileName<<endl;
-			post_threshold_createCPM_pointer(thrc,fileName);
-
-			//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
-		}
-		gettimeofday(&end, NULL);
-		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000;
-		cout << "time used for part-3.b is " << time_used << " s." << endl;
-	}
-}
-
 void SLPA::initWQueue_more(){
 	time_t st=time(NULL);
 	cout<<"Progress: Initializing memory......."<<endl;
@@ -413,7 +174,7 @@ void SLPA::GLPA_asyn_pointer(){
 		//1.shuffle
 		//cout<<"-------------t="<<t<<"---------------------"<<endl;
 		cout<<"*"<<flush;
-		srand (19920403); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
+		srand (time(NULL)); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
 		random_shuffle (net->NODES.begin(), net->NODES.end());
 		//net->showVertices();
 
@@ -439,282 +200,9 @@ void SLPA::GLPA_asyn_pointer(){
 
 		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
 	}
-	v = net->NODES[43];
-	cout << endl;
-	for (int i = 0; i < v->WQueue.size(); i ++)
-	{
-		cout << v->WQueue[i] << ' ';
-	}
-	cout << endl;
 
 	cout<<endl;
 	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
-}
-
-void SLPA::GLPA_asyn_pointer_time(){
-	//pointer version:
-	//	 store the pointer of nb in *nbList_P*
-	//   save time for retrieving hashTable
-	time_t st=time(NULL);
-
-	NODE *v,*nbv;
-	int label;
-	vector<int> nbWs;
-	map<int,NODE *>::iterator mit;
-
-	//t=1 because we initialize the WQ(t=0)
-	cout<<"Start iteration:";
-
-	for(int t=1;t<maxT;t++){
-		//1.shuffle
-		//cout<<"-------------t="<<t<<"---------------------"<<endl;
-		cout<<"*"<<flush;
-		srand (19920403); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
-		random_shuffle (net->NODES.begin(), net->NODES.end());
-		//net->showVertices();
-
-
-		//2. do one iteration-asyn
-		for(int i=0;i<net->N;i++){
-			v=net->NODES[i];
-
-			//a.collect labels from nbs
-			nbWs.clear();
-
-			for(int j=0;j<v->numNbs;j++){
-				nbv=v->nbList_P[j];
-				nbWs.push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
-			}
-			/*
-			if (v->WQueue[0] == 27475 && t == 1)
-			{
-				cout << endl << "neighbours are " << endl;
-				for (int ii = 0; ii < nbWs.size(); ii ++)
-				{
-					cout << nbWs[ii] << ' ';
-				}
-				cout << endl;
-			}
-			*/
-			//b.select one of the most frequent label
-			label=ceateHistogram_selRandMax(nbWs);
-			/*
-			if (v->WQueue[0] == 27475 && t == 1)
-			{
-				cout << "label = " << label << endl;
-			}
-			*/
-			//c. update the WQ **IMMEDIATELY**
-			v->WQueue.push_back(label);
-		}
-
-		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
-	}
-	v = net->NODES[43];
-	cout << endl;
-	for (int i = 0; i < v->WQueue.size(); i ++)
-	{
-		cout << v->WQueue[i] << ' ';
-	}
-	cout << endl;
-
-	cout<<endl;
-	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
-}
-
-void SLPA::GLPA_asyn_pointer_qiao_v1(){
-	//pointer version:
-	//	 store the pointer of nb in *nbList_P*
-	//   save time for retrieving hashTable
-	time_t st=time(NULL);
-
-	NODE *v,*nbv;
-	unordered_map<int, int> nbWs;
-	// int label;
-
-	int labels[net->N];
-	
-	map<int,NODE *>::iterator mit;
-
-	//t=1 because we initialize the WQ(t=0)
-	cout<<"Start iteration:";
-
-	for(int t=1;t<maxT;t++){
-		//1.shuffle
-		//cout<<"-------------t="<<t<<"---------------------"<<endl;
-		cout<<"*"<<flush;
-		// srand (time(NULL)); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
-		srand(19920403);
-		random_shuffle (net->NODES.begin(), net->NODES.end());
-		//net->showVertices();
-
-
-		//2. do one iteration-asyn
-		for(int i=0;i<net->N;i++)
-		{
-			v=net->NODES[i];
-			//a.collect labels from nbs
-			nbWs.clear();
-
-			for(int j=0;j<v->numNbs;j++)
-			{
-				nbv=v->nbList_P[j];
-				// nbWs.push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);	
-				nbWs[nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]] += 1;
-			}
-			/*
-			if (v->WQueue[0] == 27475 && t == 1)
-			{
-				cout << endl << "neighbours are " << endl;
-				for (map<int,int>::iterator ii = nbWs.begin(); ii != nbWs.end(); ii ++)
-				{
-					cout << ii->first << ' ' << ii->second << endl;
-				}
-				cout << endl;
-			}
-			*/
-			//b.select one of the most frequent label
-			// label=ceateHistogram_selRandMax(nbWs);
-			labels[i] = selectMostFrequentLabel(nbWs);
-			/*
-			if (v->WQueue[0] == 27475 && t == 1)
-			{
-				cout << "label is " << labels[i] << endl;
-			}
-			*/
-			//c. update the WQ **IMMEDIATELY**
-			// v->WQueue.push_back(label);
-				
-			v->WQueue.push_back(labels[i]);
-			
-		}
-	}
-	v = net->NODES[43];
-	cout << endl;
-	for (int i = 0; i < v->WQueue.size(); i ++)
-	{
-		cout << v->WQueue[i] << ' ';
-	}
-	cout << endl;
-
-	cout<<endl;
-	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
-}
-
-void SLPA::GLPA_asyn_pointer_qiao_v2(){
-	//pointer version:
-	//	 store the pointer of nb in *nbList_P*
-	//   save time for retrieving hashTable
-	time_t st=time(NULL);
-
-	// NODE *v,*nbv;
-	// int label;
-
-	int labels[net->N];
-	
-	map<int,NODE *>::iterator mit;
-
-	//t=1 because we initialize the WQ(t=0)
-	cout<<"Start iteration:";
-
-	for(int t=1;t<maxT;t++){
-		//1.shuffle
-		//cout<<"-------------t="<<t<<"---------------------"<<endl;
-		cout<<"*"<<flush;
-		// srand (time(NULL)); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
-		srand(19920403);
-		random_shuffle (net->NODES.begin(), net->NODES.end());
-		//net->showVertices();
-
-
-		//2. do one iteration-asyn
-
-		#pragma omp parallel num_threads(numThreads) 
-		{
-			NODE *v, *nbv;
-			unordered_map<int, int> nbWs;
-
-			#pragma omp for schedule(dynamic) private(v, nbv, nbWs) 
-			for(int i=0;i<net->N;i++)
-			{
-				v=net->NODES[i];
-				//a.collect labels from nbs
-				nbWs.clear();
-
-				for(int j=0;j<v->numNbs;j++)
-				{
-					nbv=v->nbList_P[j];
-					// nbWs.push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
-					
-					nbWs[nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]] += 1;
-
-				}
-
-				//b.select one of the most frequent label
-				// label=ceateHistogram_selRandMax(nbWs);
-				labels[i] = selectMostFrequentLabel(nbWs);
-
-				//c. update the WQ **IMMEDIATELY**
-				// v->WQueue.push_back(label);
-				/*
-				#pragma omp critical
-				{
-					v->WQueue.push_back(labels[i]);
-				}
-				*/
-			}
-			/*	
-			#pragma omp for schedule(static) private(v) 
-			for (int i = 0; i < net->N; i ++)
-			{
-				v = net->NODES[i];
-				v->WQueue.push_back(labels[i]);
-			}
-			*/	
-		}
-		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
-	}
-
-	cout<<endl;
-	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
-}
-
-int SLPA::selectMostFrequentLabel(unordered_map<int, int>& labelsList)
-{
-	int label;
-	int maximum = 0;
-	vector<int> mostLabelsList;
-	unordered_map<int, int>::iterator mit;
-
-	for (mit = labelsList.begin(); mit != labelsList.end(); mit ++)
-	{
-		if (mit->second > maximum)
-		{
-			maximum = mit->second;
-			mostLabelsList.clear();
-			mostLabelsList.push_back(mit->first);
-		}
-		else if (mit->second == maximum)
-		{
-			mostLabelsList.push_back(mit->first);
-		}
-		else
-		{
-			continue;
-		}
-	}
-
-	if (mostLabelsList.size() == 1)
-	{
-		label = mostLabelsList[0];
-	}
-	else
-	{
-		int index = mtrand1.randInt(mostLabelsList.size()-1);
-		label = mostLabelsList[index];
-	}
-
-	return label;
 }
 
 int SLPA::ceateHistogram_selRandMax(const vector<int>& wordsList){
@@ -1269,3 +757,609 @@ vector<vector<int>* > SLPA::post_removeSubset_UorderedHashTable_cpmpointer_Multi
 
 	return newcpm;
 }
+
+//==================================================
+//
+// code added by korchagin
+//
+//==================================================
+SLPA::SLPA(string inputFileName,vector<double> THRS,int maxRun,int maxT,string outputDir,bool isUseLargestComp,int numThreads, int version) {
+	//inputFileName: the full path
+	//netName: short filename(non-suf)
+
+	//---------------------------
+	// set mtrand with stable time seed
+	//---------------------------
+	mtrand1 = MTRand(2010011248);
+	mtrand2 = MTRand(2014210880);
+
+	//---------------------------
+	//Extract the fileName
+	//---------------------------
+	string a,b;
+	fileName_net=inputFileName;
+	extractFileName_FullPath(inputFileName,netName,a,b);
+
+	networkPath="";
+	net=new Net(networkPath,netName,fileName_net);
+
+	//---------------------------
+	//		GLPA parameters
+	//---------------------------
+	for(int i=0;i<THRS.size();i++)
+		this->THRS.push_back(THRS[i]);   //why can not use [i]=.../???
+
+	this->maxRun=maxRun;
+	this->maxT=maxT;
+
+	isSyn=false;
+	this->isUseLargestComp=isUseLargestComp;
+	//---------------------------
+	//		more
+	//---------------------------
+	this->outputDir=outputDir;
+
+	this->numThreads=numThreads;
+
+	this->version = version;
+
+
+	if (this->version == 0)
+	{
+		start();
+	}
+	else if (this->version < 20)
+	{
+		start_time(); // instrument time recorder into the original code
+	}
+	else if (this->version >= 20)
+	{
+		start_qiao_v1(); // modified version by qiao_yuchen
+	}
+}
+
+void SLPA::start_time(){
+	//---------------------------
+	//  load network
+	//---------------------------
+	bool isSymmetrize=true; //symmetrize the edges
+
+	net->readNetwork_EdgesList(fileName_net,isUseLargestComp,isSymmetrize);
+	cout<<"Network info: N="<<net->N<< " M="<<net->M<<"(symmetric)"<<endl;
+	cout<<"load "<<fileName_net<< " done.."<<endl;
+
+	//net.showVertices();
+	//net->showVertices_Table();
+
+	//---------------------------
+	//  convert thr to count_thr
+	//---------------------------
+	pre_initial_THRCS();
+
+	//---------------------------
+	// time recorder
+	//---------------------------
+	struct timeval start, end;
+	double time_used;
+
+	//---------------------------
+	//  	game
+	//---------------------------
+	for(int run=1;run<=maxRun;run++){
+		//if(isDEBUG)
+		cout<<" run="<<run<<"......"<<endl;
+
+		//1.initial WQ and clear network
+		gettimeofday(&start, NULL);
+		initWQueue_more();
+		gettimeofday(&end, NULL);
+
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000000;
+		cout << "time used for part-1 is " << time_used << " s." << endl;
+
+		//2.GLPA
+		gettimeofday(&start, NULL);
+		if(isSyn){
+			//GLPA_syn();
+		}
+		else{
+			if (version == 11)
+			{
+				GLPA_asyn_pointer();
+			}
+			else if (version == 12)
+			{
+				GLPA_asyn_pointer_omp();
+			}
+			else if (version == 13)
+			{
+				GLPA_asyn_pointer_time();
+			}
+		}
+		gettimeofday(&end, NULL);
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000000;
+		cout << "time used for part-2 is " << time_used << " s." << endl;
+
+		//-------------------------- NOTICE ! ------------------------------------------------
+		return; // for quick test
+		//------------------------------------------------------------------------------------
+
+		//3.threshould and post-processing
+		//a. create WQhistogram
+		gettimeofday(&start, NULL);
+		post_createWQHistogram_MapEntryList();
+		gettimeofday(&end, NULL);
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000000;
+		cout << "time used for part-3.a is " << time_used << " s." << endl;
+
+		//b. thresholding and output cpm
+		gettimeofday(&start, NULL);
+		for(int i=0;i<THRCS.size();i++){
+			int thrc=THRCS[i];
+			double thrp=THRS[i];
+
+			time_t st=time(NULL);
+			cout<<"Progress: Thresholding thr="<<thrp<<"......."<<endl;
+			string fileName=outputDir+"SLPA_"+netName+"_run"+int2str(run)+"_r"+dbl2str(thrp)+ ".icpm";
+
+			if(isDEBUG) cout<<"cpm="<<fileName<<endl;
+			post_threshold_createCPM_pointer(thrc,fileName);
+
+			//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
+		}
+		gettimeofday(&end, NULL);
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000000;
+		cout << "time used for part-3.b is " << time_used << " s." << endl;
+	}
+} // end of SLPA::start_time()
+
+void SLPA::start_qiao_v1(){
+	//---------------------------
+	//  load network
+	//---------------------------
+	bool isSymmetrize=true; //symmetrize the edges
+
+	net->readNetwork_EdgesList(fileName_net,isUseLargestComp,isSymmetrize);
+	cout<<"Network info: N="<<net->N<< " M="<<net->M<<"(symmetric)"<<endl;
+	cout<<"load "<<fileName_net<< " done.."<<endl;
+
+	//net.showVertices();
+	//net->showVertices_Table();
+
+	//---------------------------
+	//  convert thr to count_thr
+	//---------------------------
+	pre_initial_THRCS();
+
+	//---------------------------
+	// time recorder
+	//---------------------------
+	struct timeval start, end;
+	double time_used;
+
+	//---------------------------
+	//  	game
+	//---------------------------
+	for(int run=1;run<=maxRun;run++){
+		//if(isDEBUG)
+		cout<<" run="<<run<<"......"<<endl;
+
+
+		//1.initial WQ and clear network
+		gettimeofday(&start, NULL);
+		initWQueue_more();
+		gettimeofday(&end, NULL);
+
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000000;
+		cout << "time used for part-1 is " << time_used << " s." << endl;
+
+		//2.GLPA
+		gettimeofday(&start, NULL);
+		if(isSyn){
+			//GLPA_syn();
+		}
+		else{
+			// GLPA_asyn_pointer();
+			if (version == 21)
+			{
+				GLPA_asyn_pointer_qiao_v1();
+			}
+			else if(version == 22)
+			{
+				GLPA_asyn_pointer_qiao_v2();
+			}
+			
+		}
+		gettimeofday(&end, NULL);
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000000;
+		cout << "time used for part-2 is " << time_used << " s." << endl;
+
+		return; // for quick test
+
+		//3.threshould and post-processing
+		//a. create WQhistogram
+		gettimeofday(&start, NULL);
+		post_createWQHistogram_MapEntryList();
+		gettimeofday(&end, NULL);
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000000;
+		cout << "time used for part-3.a is " << time_used << " s." << endl;
+
+		//b. thresholding and output cpm
+		gettimeofday(&start, NULL);
+		for(int i=0;i<THRCS.size();i++){
+			int thrc=THRCS[i];
+			double thrp=THRS[i];
+
+			time_t st=time(NULL);
+			cout<<"Progress: Thresholding thr="<<thrp<<"......."<<endl;
+			string fileName=outputDir+"SLPA_"+netName+"_run"+int2str(run)+"_r"+dbl2str(thrp)+ ".icpm";
+
+			if(isDEBUG) cout<<"cpm="<<fileName<<endl;
+			post_threshold_createCPM_pointer(thrc,fileName);
+
+			//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
+		}
+		gettimeofday(&end, NULL);
+		time_used = ((double)((end.tv_sec - start.tv_sec)*1000000+(end.tv_usec - start.tv_usec)))/1000;
+		cout << "time used for part-3.b is " << time_used << " s." << endl;
+	}
+} // end of SLPA::start_qiao_v1()
+
+void SLPA::GLPA_asyn_pointer_omp(){
+	//pointer version:
+	//	 store the pointer of nb in *nbList_P*
+	//   save time for retrieving hashTable
+	time_t st=time(NULL);
+
+	// NODE *v,*nbv;
+	// int label;
+	int labels[net->N];
+	//vector<int> nbWs;
+	map<int,NODE *>::iterator mit;
+
+	//t=1 because we initialize the WQ(t=0)
+	cout<<"Start iteration:";
+
+	for(int t=1;t<maxT;t++){
+		//1.shuffle
+		//cout<<"-------------t="<<t<<"---------------------"<<endl;
+		cout<<"*"<<flush;
+		// srand (time(NULL)); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
+		srand(19920403);
+		random_shuffle (net->NODES.begin(), net->NODES.end());
+		//net->showVertices();
+
+
+		//2. do one iteration-asyn
+		// modified version: in synchronized way
+
+		#pragma omp parallel num_threads(numThreads) 
+		{
+			int id = omp_get_thread_num();
+			NODE *v, *nbv;
+			vector<int> nbWs;
+
+			#pragma omp for schedule(dynamic)
+			for(int i=0;i<net->N;i++)
+			{
+				v=net->NODES[i];
+
+				//a.collect labels from nbs
+				nbWs.clear();
+
+				for(int j=0;j<v->numNbs;j++){
+					nbv=v->nbList_P[j];
+					nbWs.push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
+				}
+
+				//b.select one of the most frequent label
+				// label=ceateHistogram_selRandMax(nbWs);
+				labels[i] = ceateHistogram_selRandMax(nbWs);
+				//c. update the WQ **IMMEDIATELY**
+				//v->WQueue.push_back(label);
+			}
+			#pragma omp for schedule(dynamic)
+			for (int i = 0; i < net->N; i ++)
+			{
+				//c. update the WQ after all in an synchronized way
+				v = net->NODES[i];
+				v->WQueue.push_back(lables[i]);
+			}
+		}
+		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
+	} // end of for(int t=1; t<maxT; t++)
+
+	cout<<endl;
+	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
+} // end of SLPA::GLPA_asyn_pointer_omp()
+
+void SLPA::GLPA_asyn_pointer_time(){
+	//pointer version:
+	//	 store the pointer of nb in *nbList_P*
+	//   save time for retrieving hashTable
+	time_t st=time(NULL);
+
+	NODE *v,*nbv;
+	int label;
+	vector<int> nbWs;
+	map<int,NODE *>::iterator mit;
+
+	//t=1 because we initialize the WQ(t=0)
+	cout<<"Start iteration:";
+
+	for(int t=1;t<maxT;t++){
+		//1.shuffle
+		//cout<<"-------------t="<<t<<"---------------------"<<endl;
+		cout<<"*"<<flush;
+		srand (19920403); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
+		random_shuffle (net->NODES.begin(), net->NODES.end());
+		//net->showVertices();
+
+
+		//2. do one iteration-asyn
+		for(int i=0;i<net->N;i++){
+			v=net->NODES[i];
+
+			//a.collect labels from nbs
+			nbWs.clear();
+
+			for(int j=0;j<v->numNbs;j++){
+				nbv=v->nbList_P[j];
+				nbWs.push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
+			}
+			/*
+			if (v->WQueue[0] == 27475 && t == 1)
+			{
+				cout << endl << "neighbours are " << endl;
+				for (int ii = 0; ii < nbWs.size(); ii ++)
+				{
+					cout << nbWs[ii] << ' ';
+				}
+				cout << endl;
+			}
+			*/
+			//b.select one of the most frequent label
+			label=ceateHistogram_selRandMax(nbWs);
+			/*
+			if (v->WQueue[0] == 27475 && t == 1)
+			{
+				cout << "label = " << label << endl;
+			}
+			*/
+			//c. update the WQ **IMMEDIATELY**
+			v->WQueue.push_back(label);
+		}
+
+		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
+	}
+	v = net->NODES[43];
+	cout << endl;
+	for (int i = 0; i < v->WQueue.size(); i ++)
+	{
+		cout << v->WQueue[i] << ' ';
+	}
+	cout << endl;
+
+	cout<<endl;
+	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
+} // end of SLPA::GLPA_asyn_pointer_time()
+
+void SLPA::GLPA_asyn_pointer_qiao_v1(){
+	//pointer version:
+	//	 store the pointer of nb in *nbList_P*
+	//   save time for retrieving hashTable
+	time_t st=time(NULL);
+
+	NODE *v,*nbv;
+	unordered_map<int, int> nbWs;
+	// int label;
+
+	int labels[net->N];
+	
+	map<int,NODE *>::iterator mit;
+
+	//t=1 because we initialize the WQ(t=0)
+	cout<<"Start iteration:";
+
+	for(int t=1;t<maxT;t++){
+		//1.shuffle
+		//cout<<"-------------t="<<t<<"---------------------"<<endl;
+		cout<<"*"<<flush;
+		// srand (time(NULL)); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
+		srand(19920403);
+		random_shuffle (net->NODES.begin(), net->NODES.end());
+		//net->showVertices();
+
+
+		//2. do one iteration-asyn
+		for(int i=0;i<net->N;i++)
+		{
+			v=net->NODES[i];
+			//a.collect labels from nbs
+			nbWs.clear();
+
+			for(int j=0;j<v->numNbs;j++)
+			{
+				nbv=v->nbList_P[j];
+				// nbWs.push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);	
+				nbWs[nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]] += 1;
+			}
+			
+			//b.select one of the most frequent label
+			// label=ceateHistogram_selRandMax(nbWs);
+			labels[i] = selectMostFrequentLabel(nbWs);
+			
+			//c. update the WQ **IMMEDIATELY**
+			// v->WQueue.push_back(label);
+				
+			v->WQueue.push_back(labels[i]);
+			
+		}
+	}
+	v = net->NODES[43];
+	cout << endl;
+	for (int i = 0; i < v->WQueue.size(); i ++)
+	{
+		cout << v->WQueue[i] << ' ';
+	}
+	cout << endl;
+
+	cout<<endl;
+	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
+}
+
+void SLPA::GLPA_asyn_pointer_qiao_v2(){
+	//pointer version:
+	//	 store the pointer of nb in *nbList_P*
+	//   save time for retrieving hashTable
+	time_t st=time(NULL);
+
+	// NODE *v,*nbv;
+	// int label;
+
+	int labels[net->N];
+	
+	map<int,NODE *>::iterator mit;
+
+	//t=1 because we initialize the WQ(t=0)
+	cout<<"Start iteration:";
+
+	for(int t=1;t<maxT;t++){
+		//1.shuffle
+		//cout<<"-------------t="<<t<<"---------------------"<<endl;
+		cout<<"*"<<flush;
+		// srand (time(NULL)); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
+		srand(19920403);
+		random_shuffle (net->NODES.begin(), net->NODES.end());
+		//net->showVertices();
+
+
+		//2. do one iteration-asyn
+
+		#pragma omp parallel num_threads(numThreads) 
+		{
+			NODE *v, *nbv;
+			unordered_map<int, int> nbWs;
+
+			#pragma omp for schedule(dynamic) private(v, nbv, nbWs) 
+			for(int i=0;i<net->N;i++)
+			{
+				v=net->NODES[i];
+				//a.collect labels from nbs
+				nbWs.clear();
+
+				for(int j=0;j<v->numNbs;j++)
+				{
+					nbv=v->nbList_P[j];
+					// nbWs.push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
+					
+					nbWs[nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]] += 1;
+
+				}
+
+				//b.select one of the most frequent label
+				// label=ceateHistogram_selRandMax(nbWs);
+				labels[i] = selectMostFrequentLabel(nbWs);
+
+				//c. update the WQ **IMMEDIATELY**
+				// v->WQueue.push_back(label);
+				/*
+				#pragma omp critical
+				{
+					v->WQueue.push_back(labels[i]);
+				}
+				*/
+			}
+			/*	
+			#pragma omp for schedule(static) private(v) 
+			for (int i = 0; i < net->N; i ++)
+			{
+				v = net->NODES[i];
+				v->WQueue.push_back(labels[i]);
+			}
+			*/	
+		}
+		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
+	}
+
+	cout<<endl;
+	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
+}
+
+int SLPA::selectMostFrequentLabel(unordered_map<int, int>& labelsList)
+{
+	int label;
+	int maximum = 0;
+	vector<int> mostLabelsList;
+	unordered_map<int, int>::iterator mit;
+
+	for (mit = labelsList.begin(); mit != labelsList.end(); mit ++)
+	{
+		if (mit->second > maximum)
+		{
+			maximum = mit->second;
+			mostLabelsList.clear();
+			mostLabelsList.push_back(mit->first);
+		}
+		else if (mit->second == maximum)
+		{
+			mostLabelsList.push_back(mit->first);
+		}
+		else
+		{
+			continue;
+		}
+	}
+
+	if (mostLabelsList.size() == 1)
+	{
+		label = mostLabelsList[0];
+	}
+	else
+	{
+		int index = mtrand1.randInt(mostLabelsList.size()-1);
+		label = mostLabelsList[index];
+	}
+
+	return label;
+}
+
+int SLPA::selectMostFrequentLabel_v2(map<int, int>& labelsList, vector<int>& mostLabelsList)
+{
+	int label;
+	int maximum = 0;
+	mostLabelsList.clear();	
+	unordered_map<int, int>::iterator mit;
+
+	for (mit = labelsList.begin(); mit != labelsList.end(); mit ++)
+	{
+		if (mit->second > maximum)
+		{
+			maximum = mit->second;
+			mostLabelsList.clear();
+			mostLabelsList.push_back(mit->first);
+		}
+		else if (mit->second == maximum)
+		{
+			mostLabelsList.push_back(mit->first);
+		}
+		else
+		{
+			continue;
+		}
+	}
+
+	if (mostLabelsList.size() == 1)
+	{
+		label = mostLabelsList[0];
+	}
+	else
+	{
+		int index = mtrand1.randInt(mostLabelsList.size()-1);
+		label = mostLabelsList[index];
+	}
+
+	return label;
+}
+
+

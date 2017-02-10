@@ -89,6 +89,7 @@ public:
 	void post_thresholding(vector<pair<int,int> >& pairList, int thrc, vector<int>& WS);
 
 	int selectMostFrequentLabel(unordered_map<int, int>& labelsList);
+	int selectMostFrequentLabel_v2(map<int, int>& labelsList, vector<int>& mostLabelsList);
 
 	//need to change
 	//vector<vector<int> > post_sameLabelDisconnectedComponents(vector<vector<int> >& cpm);
