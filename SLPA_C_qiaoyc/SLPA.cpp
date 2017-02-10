@@ -17,7 +17,8 @@
 #include "fileOpts.h"
 
 #include <pthread.h>
-
+#include <omp.h>
+#include <sys/time.h>
 
 typedef std::tr1::unordered_map<int, int> UOrderedH_INT_INT;
 
