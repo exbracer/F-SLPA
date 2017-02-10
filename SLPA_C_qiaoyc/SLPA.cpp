@@ -1016,7 +1016,7 @@ void SLPA::GLPA_asyn_pointer_omp(){
 	// int label;
 	int labels[net->N];
 	//vector<int> nbWs;
-	vector<int> nbWs[numThreads]
+	vector<int> nbWs[numThreads];
 	map<int,NODE *>::iterator mit;
 
 	//t=1 because we initialize the WQ(t=0)
