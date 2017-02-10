@@ -1064,7 +1064,7 @@ void SLPA::GLPA_asyn_pointer_omp(){
 			{
 				//c. update the WQ after all in an synchronized way
 				v = net->NODES[i];
-				v->WQueue.push_back(lables[i]);
+				v->WQueue.push_back(labels[i]);
 			}
 		}
 		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
@@ -1188,7 +1188,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v1(){
 			
 			//b.select one of the most frequent label
 			// label=ceateHistogram_selRandMax(nbWs);
-			labels[i] = selectMostFrequentLabel(nbWs);
+			labels[i] = selectMostFrequentLabel_v1(nbWs);
 			
 			//c. update the WQ **IMMEDIATELY**
 			// v->WQueue.push_back(label);
@@ -1260,7 +1260,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v2(){
 
 				//b.select one of the most frequent label
 				// label=ceateHistogram_selRandMax(nbWs);
-				labels[i] = selectMostFrequentLabel(nbWs);
+				labels[i] = selectMostFrequentLabel_v1(nbWs);
 
 				//c. update the WQ **IMMEDIATELY**
 				// v->WQueue.push_back(label);
@@ -1287,12 +1287,12 @@ void SLPA::GLPA_asyn_pointer_qiao_v2(){
 	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
 }
 
-int SLPA::selectMostFrequentLabel(unordered_map<int, int>& labelsList)
+int SLPA::selectMostFrequentLabel(map<int, int>& labelsList)
 {
 	int label;
 	int maximum = 0;
 	vector<int> mostLabelsList;
-	unordered_map<int, int>::iterator mit;
+	map<int, int>::iterator mit;
 
 	for (mit = labelsList.begin(); mit != labelsList.end(); mit ++)
 	{
@@ -1330,7 +1330,7 @@ int SLPA::selectMostFrequentLabel_v2(map<int, int>& labelsList, vector<int>& mos
 	int label;
 	int maximum = 0;
 	mostLabelsList.clear();	
-	unordered_map<int, int>::iterator mit;
+	map<int, int>::iterator mit;
 
 	for (mit = labelsList.begin(); mit != labelsList.end(); mit ++)
 	{
