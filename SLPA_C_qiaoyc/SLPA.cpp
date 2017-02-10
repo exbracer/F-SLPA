@@ -1062,7 +1062,7 @@ void SLPA::GLPA_asyn_pointer_omp(){
 				//c. update the WQ **IMMEDIATELY**
 				//v->WQueue.push_back(label);
 			}
-			#pragma omp for schedule(dynamic) 
+			#pragma omp for schedule(static) 
 			for (int i = 0; i < net->N; i ++)
 			{
 				//c. update the WQ after all in an synchronized way
