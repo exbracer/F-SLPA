@@ -1069,9 +1069,10 @@ void SLPA::GLPA_asyn_pointer_omp(){
 				labels[i] = ceateHistogram_selRandMax_qiao_v1(nbWs[id]);
 				// cout << "hello3" << endl;
 				//c. update the WQ **IMMEDIATELY**
-				//v->WQueue.push_back(label);
+				v->WQueue.push_back(labels[i]);
 			}
 			// cout << "xxx" << endl;
+			/*
 			#pragma omp parallel for schedule(static) num_threads(numThreads)
 			for (int i = 0; i < net->N; i ++)
 			{
@@ -1079,7 +1080,7 @@ void SLPA::GLPA_asyn_pointer_omp(){
 				NODE *v = net->NODES[i];
 				v->WQueue.push_back(labels[i]);
 			}
-		
+			*/
 		//}
 		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
 	} // end of for(int t=1; t<maxT; t++)
