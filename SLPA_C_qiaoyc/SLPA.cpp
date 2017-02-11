@@ -774,6 +774,12 @@ SLPA::SLPA(string inputFileName,vector<double> THRS,int maxRun,int maxT,string o
 	mtrand1 = MTRand(2010011248);
 	mtrand2 = MTRand(2014210880);
 
+	for (int i = 0; i < numThreads; i ++)
+	{
+		mtrand1s.push_back(MTRand(2010011248));
+		mtrand2s.push_back(MTRand(2014210880));
+	}
+
 	//---------------------------
 	//Extract the fileName
 	//---------------------------
@@ -1053,12 +1059,14 @@ void SLPA::GLPA_asyn_pointer_omp(){
 
 				for(int j=0;j<v->numNbs;j++){
 					nbv=v->nbList_P[j];
-					nbWs[id].push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
+					int index = mtrand2s[id].randInt(nbv->WQueue.size()-1);
+					nbWs[id].push_back(nbv->WQueue[index]);
+					// nbWs[id].push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
 				}
 				// cout << "hello2" << endl;
 				//b.select one of the most frequent label
 				// label=ceateHistogram_selRandMax(nbWs);
-				labels[i] = ceateHistogram_selRandMax(nbWs[id]);
+				labels[i] = ceateHistogram_selRandMax_qiao_v1(nbWs[id]);
 				// cout << "hello3" << endl;
 				//c. update the WQ **IMMEDIATELY**
 				//v->WQueue.push_back(label);
@@ -1369,4 +1377,62 @@ int SLPA::selectMostFrequentLabel_v2(map<int, int>& labelsList, vector<int>& mos
 	return label;
 }
 
+int SLPA::ceateHistogram_selRandMax_qiao_v1(const vector<int>& wordsList)
+{ 	// add random generator into each thread to keep multi-thread safe
+	int label;
+	map<int,int> hist;
+	map<int,int>::iterator mit;
+	int id = omp_get_thread_num();
+	//------------------------------------------
+	//	    1. create the histogram
+	//------------------------------------------
+	//count the number of Integer in the wordslist
+	createHistogram(hist, wordsList);
+
+	//------------------------------------------
+	//2. randomly select label(key) that corresponding to the max *values*.
+	//	    sort the key-value pairs, find the multiple max
+	//		randomly select one and return the label(key)
+	//------------------------------------------
+	//***list is int he decreasing order of value.
+	vector<pair<int,int> > pairlist;
+	sortMapInt_Int(hist, pairlist);
+
+	//for(Map.Entry en : list) {
+	//	System.out.printf("  %-8s%d%n", en.getKey(), en.getValue());
+	//}
+	//cout<<"-------------------"<<endl;
+	//for(int i=0;i<pairlist.size();i++){
+	//	cout<<"w="<<pairlist[i].first<<" count="<<pairlist[i].second<<endl;
+	//}
+
+	int maxv=pairlist[0].second;
+	int cn=1;
+
+	//cout<<"maxv="<<maxv<<endl;
+	for(int i=1;i<pairlist.size();i++){    //start from the **second**
+		if(pairlist[i].second==maxv)       //multiple max
+			cn++;
+		else
+			break; //stop when first v<maxv
+	}
+
+
+	if(cn==1)
+		label=pairlist[0].first;         //key-label
+	else{
+		//generator.nextInt(n); 0~n-1
+		//int wind=rndDblBtw0Nminus1(cn);
+		// int wind=mtrand1.randInt(cn-1); //**[0~n]
+		//cout<<"*****wind="<<wind<<endl;
+		int wind = mtrand1s[id].randInt(cn-1);
+
+		label=pairlist[wind].first;
+	}
+	//cout<<"cn="<<cn<<endl;
+	//cout<<"label="<<label<<endl;
+
+
+	return label;
+}
 

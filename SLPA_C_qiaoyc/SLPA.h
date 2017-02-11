@@ -113,6 +113,8 @@ public:
 	//---------------------------
 	// code add by qiao_yuchen
 	//---------------------------
+	vector<MTRand> mtrand1s;
+	vector<MTRand> mtrand2s;
 	SLPA(string, vector<double>, int, int, string, bool, int, int); // new construction function
 
 	void start_time(); // instrument time recorder into the original code
