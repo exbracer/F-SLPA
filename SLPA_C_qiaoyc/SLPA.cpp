@@ -1047,7 +1047,7 @@ void SLPA::GLPA_asyn_pointer_omp(){
 				NODE *v, *nbv;
 				int id = omp_get_thread_num();
 				v=net->NODES[i];
-				cout << "hello1" << endl;
+				// cout << "hello1" << endl;
 				//a.collect labels from nbs
 				nbWs[id].clear();
 
@@ -1055,11 +1055,11 @@ void SLPA::GLPA_asyn_pointer_omp(){
 					nbv=v->nbList_P[j];
 					nbWs[id].push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
 				}
-				cout << "hello2" << endl;
+				// cout << "hello2" << endl;
 				//b.select one of the most frequent label
 				// label=ceateHistogram_selRandMax(nbWs);
 				labels[i] = ceateHistogram_selRandMax(nbWs[id]);
-				cout << "hello3" << endl;
+				// cout << "hello3" << endl;
 				//c. update the WQ **IMMEDIATELY**
 				//v->WQueue.push_back(label);
 			}
