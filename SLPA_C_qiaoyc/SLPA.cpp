@@ -1041,7 +1041,7 @@ void SLPA::GLPA_asyn_pointer_omp(){
 			// NODE *v, *nbv;
 			// vector<int> nbWs;
 
-			#pragma omp parallel for schedule(dynamic) shared(labels, nbWs)
+			#pragma omp parallel for schedule(dynamic) shared(labels, nbWs) num_threads(numThreads)
 			for(int i=0;i<net->N;i++)
 			{
 				NODE *v, *nbv;
@@ -1064,7 +1064,7 @@ void SLPA::GLPA_asyn_pointer_omp(){
 				//v->WQueue.push_back(label);
 			}
 			cout << "xxx" << endl;
-			#pragma omp parallel for schedule(static) 
+			#pragma omp parallel for schedule(static) num_threads(numThreads)
 			for (int i = 0; i < net->N; i ++)
 			{
 				//c. update the WQ after all in an synchronized way
