@@ -120,7 +120,9 @@ public:
 	void start_time(); // instrument time recorder into the original code
 	void start_qiao_v1(); // modified version by qiao_yuchen
 
-	void GLPA_asyn_pointer_omp(); // add openmp on original code, actually it is synchronized version, please nootice that
+	void GLPA_asyn_pointer_omp_v1(); // add openmp on original code, actually it is synchronized version, please nootice that
+	void GLPA_asyn_pointer_omp_v2(); // add openmp on original code, and it is non-synchronized version, please nootice that
+	void GLPA_asyn_pointer_omp_v3(); // add openmp on original code, generate multi-threads out of for-loop of maxT
 	void GLPA_asyn_pointer_time(); // intrument time recoder into the original code
 	void GLPA_asyn_pointer_qiao_v1(); // modified version by qiao_yuchen
 	void GLPA_asyn_pointer_qiao_v2(); // modified version by qiao_yuchen with openmp
