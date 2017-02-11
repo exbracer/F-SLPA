@@ -127,6 +127,7 @@ public:
 
 	int selectMostFrequentLabel_v1(map<int, int>& labelsList);
 	int selectMostFrequentLabel_v2(map<int, int>& labelsList, vector<int>& mostLabelsList);
+	int ceateHistogram_selRandMax_qiao_v1(const vector<int>& wordsList);
 
 };
 
