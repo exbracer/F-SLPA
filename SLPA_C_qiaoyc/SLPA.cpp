@@ -1017,7 +1017,7 @@ void SLPA::GLPA_asyn_pointer_omp(){
 	int labels[net->N];
 	//vector<int> nbWs;
 	vector<int> nbWs[numThreads];
-	map<int,NODE *>::iterator mit;
+	// map<int,NODE *>::iterator mit;
 
 	//t=1 because we initialize the WQ(t=0)
 	cout<<"Start iteration:";
@@ -1047,7 +1047,7 @@ void SLPA::GLPA_asyn_pointer_omp(){
 				NODE *v, *nbv;
 				int id = omp_get_thread_num();
 				v=net->NODES[i];
-
+				cout << "hello1" << endl;
 				//a.collect labels from nbs
 				nbWs[id].clear();
 
@@ -1055,14 +1055,15 @@ void SLPA::GLPA_asyn_pointer_omp(){
 					nbv=v->nbList_P[j];
 					nbWs[id].push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
 				}
-
+				cout << "hello2" << endl;
 				//b.select one of the most frequent label
 				// label=ceateHistogram_selRandMax(nbWs);
 				labels[i] = ceateHistogram_selRandMax(nbWs[id]);
+				cout << "hello3" << endl;
 				//c. update the WQ **IMMEDIATELY**
 				//v->WQueue.push_back(label);
 			}
-
+			cout << "xxx" << endl;
 			#pragma omp parallel for schedule(static) 
 			for (int i = 0; i < net->N; i ++)
 			{
