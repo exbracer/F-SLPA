@@ -1063,7 +1063,7 @@ void SLPA::GLPA_asyn_pointer_omp(){
 				//c. update the WQ **IMMEDIATELY**
 				//v->WQueue.push_back(label);
 			}
-			cout << "xxx" << endl;
+			// cout << "xxx" << endl;
 			#pragma omp parallel for schedule(static) num_threads(numThreads)
 			for (int i = 0; i < net->N; i ++)
 			{
