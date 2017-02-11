@@ -870,15 +870,23 @@ void SLPA::start_time(){
 			//GLPA_syn();
 		}
 		else{
-			if (version == 11)
+			if (version == 10)
 			{
 				GLPA_asyn_pointer();
 			}
+			else if (version == 11)
+			{
+				GLPA_asyn_pointer_omp_v1();
+			}
 			else if (version == 12)
 			{
-				GLPA_asyn_pointer_omp();
+				GLPA_asyn_pointer_omp_v2();
 			}
 			else if (version == 13)
+			{
+				GLPA_asyn_pointer_omp_v3();
+			}
+			else if (version == 14)
 			{
 				GLPA_asyn_pointer_time();
 			}
