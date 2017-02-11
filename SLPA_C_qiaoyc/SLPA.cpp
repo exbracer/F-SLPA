@@ -1204,7 +1204,7 @@ void SLPA::GLPA_asyn_pointer_omp_v3(){
 			// NODE *v, *nbv;
 			// vector<int> nbWs;
 
-			#pragma omp for schedule(dynamic) num_threads(numThreads)
+			#pragma omp for schedule(dynamic) 
 			for(int i=0;i<net->N;i++)
 			{
 				NODE *v, *nbv;
