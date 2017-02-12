@@ -2009,7 +2009,7 @@ int SLPA::ceateHistogram_selRandMax_qiao_v2(const vector<int>& wordsList, MTRand
 	return label;
 }
 
-void SetWQueueSize()
+void SLPA::SetWQueueSize()
 {
 	NODE * v;
 	for (int i = 0; i < net->N; i ++)
