@@ -1518,18 +1518,23 @@ void SLPA::GLPA_asyn_pointer_time(){
 	vector<int> nbWs;
 	map<int,NODE *>::iterator mit;
 
+	struct timeval start_1, end_1, start_2, end_2;
+	double time_used_1 = 0.0, time_used_2 = 0.0;
 	//t=1 because we initialize the WQ(t=0)
 	// cout<<"Start iteration:";
 
 	for(int t=1;t<maxT;t++){
 		//1.shuffle
 		//cout<<"-------------t="<<t<<"---------------------"<<endl;
-		cout<<"*"<<flush;
+		//cout<<"*"<<flush;
+		gettimeofday(&start_1, NULL);
 		srand (19920403); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
 		random_shuffle (net->NODES.begin(), net->NODES.end());
 		//net->showVertices();
+		gettimeofday(&end_1, NULL);
+		double time_used_1 += ((double)((end_1.tv_sec-start_1.tv_sec)*1000000+(end_1.tv_usec-start_1.tv_usec)))/1000000;
 
-
+		gettimeofday(&start_2, NULL);
 		//2. do one iteration-asyn
 		for(int i=0;i<net->N;i++){
 			v=net->NODES[i];
@@ -1563,16 +1568,12 @@ void SLPA::GLPA_asyn_pointer_time(){
 			//c. update the WQ **IMMEDIATELY**
 			v->WQueue.push_back(label);
 		}
-
+		gettimeofday(&end_2, NULL);
+		double time_used_2 += ((double)((end_2.tv_sec-start_2.tv_sec)*1000000+(end_2.tv_usec-start_2.tv_usec)))/1000000;
 		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
 	}
-	v = net->NODES[43];
-	cout << endl;
-	for (int i = 0; i < v->WQueue.size(); i ++)
-	{
-		cout << v->WQueue[i] << ' ';
-	}
-	cout << endl;
+	cout << "time used for part-2-a is " << time_used_1 << " s." << endl;
+	cout << "time used for part-2-b is " << time_used_2 << " s." << endl;	
 
 	// cout<<endl;
 	// cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
