@@ -20,9 +20,20 @@
 #include <omp.h>
 #include <sys/time.h>
 
+#define MAX_NUM_THREADS 64
+
 typedef std::tr1::unordered_map<int, int> UOrderedH_INT_INT;
 
 bool SLPA::isDEBUG=false;
+
+//----------------------------
+// added by qiao_yuchen
+// put shared variables on heap more than stack
+//----------------------------
+int * labels_h;
+vector<int> nbWs_h[MAX_NUM_THREADS];
+MTRand mtrand1s_h[MAX_NUM_THREADS];
+MTRand mtrand2s_h[MAX_NUM_THREADS];
 
 SLPA::SLPA(string inputFileName,vector<double> THRS,int maxRun,int maxT,string outputDir,bool isUseLargestComp,int numThreads) {
 	//inputFileName: the full path
@@ -888,6 +899,18 @@ void SLPA::start_time(){
 			}
 			else if (version == 14)
 			{
+				GLPA_asyn_pointer_omp_v4();
+			}
+			else if (version == 15)
+			{
+				GLPA_asyn_pointer_omp_v5();
+			}
+			else if (version == 16)
+			{
+				GLPA_asyn_pointer_omp_v6();
+			}
+			else 
+			{
 				GLPA_asyn_pointer_time();
 			}
 		}
@@ -1181,7 +1204,7 @@ void SLPA::GLPA_asyn_pointer_omp_v3(){
 	//t=1 because we initialize the WQ(t=0)
 	// cout<<"Start iteration:";
 
-	#pragma omp parallel num_threads(numThreads) shared(nbWs)
+	#pragma omp parallel num_threads(numThreads) shared(nbWs, labels)
 	{
 	for(int t=1;t<maxT;t++){
 		//1.shuffle
@@ -1315,6 +1338,165 @@ void SLPA::GLPA_asyn_pointer_omp_v4(){
 	// cout<<endl;
 	// cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
 } // end of SLPA::GLPA_asyn_pointer_omp_v4()
+
+void SLPA::GLPA_asyn_pointer_omp_v5(){
+	//pointer version:
+	//	 store the pointer of nb in *nbList_P*
+	//   save time for retrieving hashTable
+	time_t st=time(NULL);
+
+	// NODE *v,*nbv;
+	// int label;
+	// int labels[net->N];
+	labels_h = new int[net->N]；
+	//vector<int> nbWs;
+	// vector<int> nbWs[numThreads];
+	// vector<int> * nbWs;
+	// map<int,NODE *>::iterator mit;
+
+	//t=1 because we initialize the WQ(t=0)
+	// cout<<"Start iteration:";
+
+	#pragma omp parallel num_threads(numThreads) shared(nbWs_h, labels_h)
+	{
+		NODE *v, *nbv;
+	for(int t=1;t<maxT;t++){
+		//1.shuffle
+		//cout<<"-------------t="<<t<<"---------------------"<<endl;
+		#pragma omp single
+		{
+		// cout<<"*"<<flush;
+		// srand (time(NULL)); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
+		srand(19920403);
+		random_shuffle (net->NODES.begin(), net->NODES.end());
+		}
+		//net->showVertices();
+
+
+		//2. do one iteration-asyn
+		// modified version: in synchronized way
+
+		// #pragma omp parallel num_threads(numThreads) 
+		// {
+			// int id = omp_get_thread_num();
+			// NODE *v, *nbv;
+			// vector<int> nbWs;
+
+			#pragma omp for schedule(dynamic) 
+			for(int i=0;i<net->N;i++)
+			{
+				// NODE *v, *nbv;
+				int id = omp_get_thread_num();
+				v=net->NODES[i];
+				// cout << "hello1" << endl;
+				//a.collect labels from nbs
+				// nbWs[id].clear();
+				nbWs_h[id].clear();
+				for(int j=0;j<v->numNbs;j++){
+					nbv=v->nbList_P[j];
+					int index = mtrand2s[id].randInt(nbv->WQueue.size()-1);
+					// nbWs[id].push_back(nbv->WQueue[index]);
+					nbWs_h[id].push_back(nbv->WQueue[index]);
+					// nbWs[id].push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
+				}
+				// cout << "hello2" << endl;
+				//b.select one of the most frequent label
+				// label=ceateHistogram_selRandMax(nbWs);
+				// labels[i] = ceateHistogram_selRandMax_qiao_v1(nbWs[id]);
+				labels_h[i] = ceateHistogram_selRandMax_qiao_v2(nbWs_h[id]);
+				// cout << "hello3" << endl;
+				//c. update the WQ **IMMEDIATELY**
+				// v->WQueue.push_back(label);
+			}
+			#pragma omp for schedule(static)
+			for (int i = 0; i < net->N; i ++)
+			{
+				v = net->NODES[i];
+				v->WQueue.push_back(labels_h[i]);
+			}
+		//}
+		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
+	} // end of for(int t=1; t<maxT; t++)
+	} // end of #pragma omp parallel 	
+	// cout<<endl;
+	// cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
+} // end of SLPA::GLPA_asyn_pointer_omp_v5()
+
+void SLPA::GLPA_asyn_pointer_omp_v6(){
+	//pointer version:
+	//	 store the pointer of nb in *nbList_P*
+	//   save time for retrieving hashTable
+	time_t st=time(NULL);
+
+	// NODE *v,*nbv;
+	// int label;
+	// int labels[net->N];
+	//vector<int> nbWs;
+	vector<int> nbWs[numThreads];
+	// vector<int> * nbWs;
+	// map<int,NODE *>::iterator mit;
+
+	//t=1 because we initialize the WQ(t=0)
+	// cout<<"Start iteration:";
+
+	#pragma omp parallel num_threads(numThreads) shared(nbWs)
+	{
+		NODE *v, *nbv;
+	for(int t=1;t<maxT;t++){
+		//1.shuffle
+		//cout<<"-------------t="<<t<<"---------------------"<<endl;
+		#pragma omp single
+		{
+		// cout<<"*"<<flush;
+		// srand (time(NULL)); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
+		srand(19920403);
+		random_shuffle (net->NODES.begin(), net->NODES.end());
+		}
+		//net->showVertices();
+
+
+		//2. do one iteration-asyn
+		// modified version: in synchronized way
+
+		// #pragma omp parallel num_threads(numThreads) 
+		// {
+			// int id = omp_get_thread_num();
+			// NODE *v, *nbv;
+			// vector<int> nbWs;
+
+			#pragma omp for schedule(dynamic) 
+			for(int i=0;i<net->N;i++)
+			{
+				// NODE *v, *nbv;
+				int id = omp_get_thread_num();
+				v=net->NODES[i];
+				// cout << "hello1" << endl;
+				//a.collect labels from nbs
+				// nbWs[id].clear();
+				nbWs_h[id].clear();
+
+				for(int j=0;j<v->numNbs;j++){
+					nbv=v->nbList_P[j];
+					int index = mtrand2s[id].randInt(nbv->WQueue.size()-1);
+					// nbWs[id].push_back(nbv->WQueue[index]);
+					nbWs_h[id].push_back(nbv->WQueue[index]);
+					// nbWs[id].push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
+				}
+				// cout << "hello2" << endl;
+				//b.select one of the most frequent label
+				// label=ceateHistogram_selRandMax(nbWs);
+				int label = ceateHistogram_selRandMax_qiao_v2(nbWs[id]);
+				// cout << "hello3" << endl;
+				//c. update the WQ **IMMEDIATELY**
+				v->WQueue.push_back(label);
+			}
+		//}
+		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
+	} // end of for(int t=1; t<maxT; t++)
+	} // end of #pragma omp parallel 	
+	// cout<<endl;
+	// cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
+} // end of SLPA::GLPA_asyn_pointer_omp_v6()
 
 
 void SLPA::GLPA_asyn_pointer_time(){
@@ -1665,3 +1847,61 @@ int SLPA::ceateHistogram_selRandMax_qiao_v1(const vector<int>& wordsList)
 	return label;
 }
 
+int SLPA::ceateHistogram_selRandMax_qiao_v1(const vector<int>& wordsList)
+{ 	// add random generator into each thread to keep multi-thread safe
+	int label;
+	map<int,int> hist;
+	map<int,int>::iterator mit;
+	int id = omp_get_thread_num();
+	//------------------------------------------
+	//	    1. create the histogram
+	//------------------------------------------
+	//count the number of Integer in the wordslist
+	createHistogram(hist, wordsList);
+
+	//------------------------------------------
+	//2. randomly select label(key) that corresponding to the max *values*.
+	//	    sort the key-value pairs, find the multiple max
+	//		randomly select one and return the label(key)
+	//------------------------------------------
+	//***list is int he decreasing order of value.
+	vector<pair<int,int> > pairlist;
+	sortMapInt_Int(hist, pairlist);
+
+	//for(Map.Entry en : list) {
+	//	System.out.printf("  %-8s%d%n", en.getKey(), en.getValue());
+	//}
+	//cout<<"-------------------"<<endl;
+	//for(int i=0;i<pairlist.size();i++){
+	//	cout<<"w="<<pairlist[i].first<<" count="<<pairlist[i].second<<endl;
+	//}
+
+	int maxv=pairlist[0].second;
+	int cn=1;
+
+	//cout<<"maxv="<<maxv<<endl;
+	for(int i=1;i<pairlist.size();i++){    //start from the **second**
+		if(pairlist[i].second==maxv)       //multiple max
+			cn++;
+		else
+			break; //stop when first v<maxv
+	}
+
+
+	if(cn==1)
+		label=pairlist[0].first;         //key-label
+	else{
+		//generator.nextInt(n); 0~n-1
+		//int wind=rndDblBtw0Nminus1(cn);
+		// int wind=mtrand1.randInt(cn-1); //**[0~n]
+		//cout<<"*****wind="<<wind<<endl;
+		// int wind = mtrand1s[id].randInt(cn-1);
+		int wind = mtrand1s_h[id].randInt(cn-1);
+		label=pairlist[wind].first;
+	}
+	//cout<<"cn="<<cn<<endl;
+	//cout<<"label="<<label<<endl;
+
+
+	return label;
+}
