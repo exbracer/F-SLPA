@@ -180,12 +180,12 @@ void SLPA::GLPA_asyn_pointer(){
 	map<int,NODE *>::iterator mit;
 
 	//t=1 because we initialize the WQ(t=0)
-	cout<<"Start iteration:";
+	// cout<<"Start iteration:";
 
 	for(int t=1;t<maxT;t++){
 		//1.shuffle
 		//cout<<"-------------t="<<t<<"---------------------"<<endl;
-		cout<<"*"<<flush;
+		// cout<<"*"<<flush;
 		srand (time(NULL)); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
 		random_shuffle (net->NODES.begin(), net->NODES.end());
 		//net->showVertices();
@@ -213,8 +213,8 @@ void SLPA::GLPA_asyn_pointer(){
 		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
 	}
 
-	cout<<endl;
-	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
+	// cout<<endl;
+	// cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
 }
 
 int SLPA::ceateHistogram_selRandMax(const vector<int>& wordsList){
