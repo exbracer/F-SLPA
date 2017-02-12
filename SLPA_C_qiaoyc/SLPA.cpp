@@ -1357,7 +1357,7 @@ void SLPA::GLPA_asyn_pointer_omp_v5(){
 	//t=1 because we initialize the WQ(t=0)
 	// cout<<"Start iteration:";
 
-	#pragma omp parallel num_threads(numThreads) shared(nbWs_h, labels_h)
+	#pragma omp parallel num_threads(numThreads) shared(labels_h)
 	{
 		NODE *v, *nbv;
 		vector<int> nbWs_s;
@@ -1444,7 +1444,7 @@ void SLPA::GLPA_asyn_pointer_omp_v6(){
 	//t=1 because we initialize the WQ(t=0)
 	// cout<<"Start iteration:";
 
-	#pragma omp parallel num_threads(numThreads) shared(nbWs)
+	#pragma omp parallel num_threads(numThreads)
 	{
 		NODE *v, *nbv;
 		vector<int> nbWs_s;
@@ -1493,7 +1493,7 @@ void SLPA::GLPA_asyn_pointer_omp_v6(){
 				// cout << "hello2" << endl;
 				//b.select one of the most frequent label
 				// label=ceateHistogram_selRandMax(nbWs);
-				int label = ceateHistogram_selRandMax_qiao_v2(nbWs_s, mtrans1_s);
+				int label = ceateHistogram_selRandMax_qiao_v2(nbWs_s, mtrand1_s);
 				// cout << "hello3" << endl;
 				//c. update the WQ **IMMEDIATELY**
 				v->WQueue.push_back(label);
@@ -1855,7 +1855,7 @@ int SLPA::ceateHistogram_selRandMax_qiao_v1(const vector<int>& wordsList)
 	return label;
 }
 
-int SLPA::ceateHistogram_selRandMax_qiao_v2(const vector<int>& wordsList, MTrand& mtrand1_s)
+int SLPA::ceateHistogram_selRandMax_qiao_v2(const vector<int>& wordsList, MTRand& mtrand1_s)
 { 	// add random generator into each thread to keep multi-thread safe
 	int label;
 	map<int,int> hist;
