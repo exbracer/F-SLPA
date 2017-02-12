@@ -1532,7 +1532,7 @@ void SLPA::GLPA_asyn_pointer_time(){
 		random_shuffle (net->NODES.begin(), net->NODES.end());
 		//net->showVertices();
 		gettimeofday(&end_1, NULL);
-		double time_used_1 += ((double)((end_1.tv_sec-start_1.tv_sec)*1000000+(end_1.tv_usec-start_1.tv_usec)))/1000000;
+		time_used_1 += ((double)((end_1.tv_sec-start_1.tv_sec)*1000000+(end_1.tv_usec-start_1.tv_usec)))/1000000;
 
 		gettimeofday(&start_2, NULL);
 		//2. do one iteration-asyn
@@ -1569,7 +1569,7 @@ void SLPA::GLPA_asyn_pointer_time(){
 			v->WQueue.push_back(label);
 		}
 		gettimeofday(&end_2, NULL);
-		double time_used_2 += ((double)((end_2.tv_sec-start_2.tv_sec)*1000000+(end_2.tv_usec-start_2.tv_usec)))/1000000;
+		time_used_2 += ((double)((end_2.tv_sec-start_2.tv_sec)*1000000+(end_2.tv_usec-start_2.tv_usec)))/1000000;
 		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
 	}
 	cout << "time used for part-2-a is " << time_used_1 << " s." << endl;
