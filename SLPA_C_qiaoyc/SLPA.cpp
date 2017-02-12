@@ -1506,6 +1506,95 @@ void SLPA::GLPA_asyn_pointer_omp_v6(){
 	// cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
 } // end of SLPA::GLPA_asyn_pointer_omp_v6()
 
+void SLPA::GLPA_asyn_pointer_omp_v7(){
+	//pointer version:
+	//	 store the pointer of nb in *nbList_P*
+	//   save time for retrieving hashTable
+	time_t st=time(NULL);
+
+	// NODE *v,*nbv;
+	// int label;
+	// int labels[net->N];
+	labels_h = new int[net->N];
+	//vector<int> nbWs;
+	// vector<int> nbWs[numThreads];
+	// vector<int> * nbWs;
+	// map<int,NODE *>::iterator mit;
+
+	//t=1 because we initialize the WQ(t=0)
+	// cout<<"Start iteration:";
+
+	#pragma omp parallel num_threads(numThreads) shared(labels_h)
+	{
+		NODE *v, *nbv;
+		vector<int> nbWs_s;
+		nbWs_s.reserve(1000);
+		MTRand mtrand1_s = MTRand(2010011248);
+		MTRand mtrand2_s = MTRand(2014210880);
+	for(int t=1;t<maxT;t++){
+		//1.shuffle
+		//cout<<"-------------t="<<t<<"---------------------"<<endl;
+		#pragma omp single
+		{
+		// cout<<"*"<<flush;
+		// srand (time(NULL)); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
+		srand(19920403);
+		random_shuffle (net->NODES.begin(), net->NODES.end());
+		}
+		//net->showVertices();
+
+
+		//2. do one iteration-asyn
+		// modified version: in synchronized way
+
+		// #pragma omp parallel num_threads(numThreads) 
+		// {
+			// int id = omp_get_thread_num();
+			// NODE *v, *nbv;
+			// vector<int> nbWs;
+
+			#pragma omp for schedule(dynamic) 
+			for(int i=0;i<net->N;i++)
+			{
+				// NODE *v, *nbv;
+				int id = omp_get_thread_num();
+				v=net->NODES[i];
+				// cout << "hello1" << endl;
+				//a.collect labels from nbs
+				// nbWs[id].clear();
+				nbWs_s.clear();
+
+				for(int j=0;j<v->numNbs;j++){
+					nbv=v->nbList_P[j];
+					int index = mtrand2_s.randInt(nbv->WQueue.size()-1);
+					// nbWs[id].push_back(nbv->WQueue[index]);
+					nbWs_s.push_back(nbv->WQueue[index]);
+					// nbWs[id].push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
+				}
+				// cout << "hello2" << endl;
+				//b.select one of the most frequent label
+				// label=ceateHistogram_selRandMax(nbWs);
+				// labels[i] = ceateHistogram_selRandMax_qiao_v1(nbWs[id]);
+				labels_h[i] = ceateHistogram_selRandMax_qiao_v2(nbWs_s, mtrand1_s);
+				// cout << "hello3" << endl;
+				//c. update the WQ **IMMEDIATELY**
+				// v->WQueue.push_back(label);
+			}
+			#pragma omp for schedule(static)
+			for (int i = 0; i < net->N; i ++)
+			{
+				v = net->NODES[i];
+				v->WQueue.push_back(labels_h[i]);
+			}
+		//}
+		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
+	} // end of for(int t=1; t<maxT; t++)
+	} // end of #pragma omp parallel 	
+
+	delete [] labels_h; 
+	// cout<<endl;
+	// cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
+} // end of SLPA::GLPA_asyn_pointer_omp_v7()
 
 void SLPA::GLPA_asyn_pointer_time(){
 	//pointer version:
@@ -1913,4 +2002,14 @@ int SLPA::ceateHistogram_selRandMax_qiao_v2(const vector<int>& wordsList, MTRand
 
 
 	return label;
+}
+
+void SetWQueueSize()
+{
+	NODE * v;
+	for (int i = 0; i < net->N; i ++)
+	{
+		v = NODES[i];
+		v->WQueue.reserve(maxT);
+	}
 }
