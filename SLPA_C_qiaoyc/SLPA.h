@@ -128,6 +128,7 @@ public:
 	void GLPA_asyn_pointer_omp_v4(); // add openmp on original code, generate multi-threads out of for-loop of maxT in non-synchronized way
 	void GLPA_asyn_pointer_omp_v5(); // add openmp on original code, multi-threads out of outer for-loop, shared variables on heap while private on each thread's own stack in synchronized way 
 	void GLPA_asyn_pointer_omp_v6(); // add openmp on original code, multi-threads out of outer for-loop, shared variables on heap while private on each thread's own stack in non-synchronized way
+	void GLPA_asyn_pointer_omp_v7(); // add openmp on original code, multi-threads out of outer for-loop, shared variables on heap while private on each thread's own stack， reduce memory allocate times for length variation of vector in synchronized way 
 	
 	void GLPA_asyn_pointer_qiao_v1(); // modified version by qiao_yuchen
 	void GLPA_asyn_pointer_qiao_v2(); // modified version by qiao_yuchen with openmp
@@ -137,6 +138,8 @@ public:
 
 	int ceateHistogram_selRandMax_qiao_v1(const vector<int>& wordsList); // use multi random generator
 	int ceateHistogram_selRandMax_qiao_v2(const vector<int>& wordsList, MTRand& mtrand1_s); // use multi random generator and put them on heap
+
+	void SetWQueueSize();
 };
 
 #endif /* SLPA_H_ */

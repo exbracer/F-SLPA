@@ -909,6 +909,11 @@ void SLPA::start_time(){
 			{
 				GLPA_asyn_pointer_omp_v6();
 			}
+			else if (version == 17)
+			{
+				SetWQueueSize();
+				GLPA_asyn_pointer_omp_v7();
+			}
 			else 
 			{
 				GLPA_asyn_pointer_time();
