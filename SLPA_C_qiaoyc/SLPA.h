@@ -136,7 +136,7 @@ public:
 	int selectMostFrequentLabel_v2(map<int, int>& labelsList, vector<int>& mostLabelsList);
 
 	int ceateHistogram_selRandMax_qiao_v1(const vector<int>& wordsList); // use multi random generator
-	int ceateHistogram_selRandMax_qiao_v2(const vector<int>& wordsList); // use multi random generator and put them on heap
+	int ceateHistogram_selRandMax_qiao_v2(const vector<int>& wordsList, MTRand& mtrand1_s); // use multi random generator and put them on heap
 };
 
 #endif /* SLPA_H_ */

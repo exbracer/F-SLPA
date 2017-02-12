@@ -1360,6 +1360,9 @@ void SLPA::GLPA_asyn_pointer_omp_v5(){
 	#pragma omp parallel num_threads(numThreads) shared(nbWs_h, labels_h)
 	{
 		NODE *v, *nbv;
+		vector<int> nbWs_s;
+		MTRand mtrand1_s = MTRand(2010011248);
+		MTRand mtrand2_s = MTRand(2014210880);
 	for(int t=1;t<maxT;t++){
 		//1.shuffle
 		//cout<<"-------------t="<<t<<"---------------------"<<endl;
@@ -1391,19 +1394,19 @@ void SLPA::GLPA_asyn_pointer_omp_v5(){
 				// cout << "hello1" << endl;
 				//a.collect labels from nbs
 				// nbWs[id].clear();
-				nbWs_h[id].clear();
+				nbWs_s.clear();
 				for(int j=0;j<v->numNbs;j++){
 					nbv=v->nbList_P[j];
-					int index = mtrand2s[id].randInt(nbv->WQueue.size()-1);
+					int index = mtrand2_s.randInt(nbv->WQueue.size()-1);
 					// nbWs[id].push_back(nbv->WQueue[index]);
-					nbWs_h[id].push_back(nbv->WQueue[index]);
+					nbWs_s.push_back(nbv->WQueue[index]);
 					// nbWs[id].push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
 				}
 				// cout << "hello2" << endl;
 				//b.select one of the most frequent label
 				// label=ceateHistogram_selRandMax(nbWs);
 				// labels[i] = ceateHistogram_selRandMax_qiao_v1(nbWs[id]);
-				labels_h[i] = ceateHistogram_selRandMax_qiao_v2(nbWs_h[id]);
+				labels_h[i] = ceateHistogram_selRandMax_qiao_v2(nbWs_s, mtrand1_s);
 				// cout << "hello3" << endl;
 				//c. update the WQ **IMMEDIATELY**
 				// v->WQueue.push_back(label);
@@ -1418,6 +1421,8 @@ void SLPA::GLPA_asyn_pointer_omp_v5(){
 		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
 	} // end of for(int t=1; t<maxT; t++)
 	} // end of #pragma omp parallel 	
+
+	delete [] labels_h; 
 	// cout<<endl;
 	// cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
 } // end of SLPA::GLPA_asyn_pointer_omp_v5()
@@ -1432,7 +1437,7 @@ void SLPA::GLPA_asyn_pointer_omp_v6(){
 	// int label;
 	// int labels[net->N];
 	//vector<int> nbWs;
-	vector<int> nbWs[numThreads];
+	// vector<int> nbWs[numThreads];
 	// vector<int> * nbWs;
 	// map<int,NODE *>::iterator mit;
 
@@ -1442,6 +1447,9 @@ void SLPA::GLPA_asyn_pointer_omp_v6(){
 	#pragma omp parallel num_threads(numThreads) shared(nbWs)
 	{
 		NODE *v, *nbv;
+		vector<int> nbWs_s;
+		MTRand mtrand1_s = MTRand(2010011248);
+		MTRand mtrand2_s = MTRand(2014210880);
 	for(int t=1;t<maxT;t++){
 		//1.shuffle
 		//cout<<"-------------t="<<t<<"---------------------"<<endl;
@@ -1473,19 +1481,19 @@ void SLPA::GLPA_asyn_pointer_omp_v6(){
 				// cout << "hello1" << endl;
 				//a.collect labels from nbs
 				// nbWs[id].clear();
-				nbWs_h[id].clear();
+				nbWs_s.clear();
 
 				for(int j=0;j<v->numNbs;j++){
 					nbv=v->nbList_P[j];
-					int index = mtrand2s[id].randInt(nbv->WQueue.size()-1);
+					int index = mtrand2_s.randInt(nbv->WQueue.size()-1);
 					// nbWs[id].push_back(nbv->WQueue[index]);
-					nbWs_h[id].push_back(nbv->WQueue[index]);
+					nbWs_s.push_back(nbv->WQueue[index]);
 					// nbWs[id].push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
 				}
 				// cout << "hello2" << endl;
 				//b.select one of the most frequent label
 				// label=ceateHistogram_selRandMax(nbWs);
-				int label = ceateHistogram_selRandMax_qiao_v2(nbWs[id]);
+				int label = ceateHistogram_selRandMax_qiao_v2(nbWs_s, mtrans1_s);
 				// cout << "hello3" << endl;
 				//c. update the WQ **IMMEDIATELY**
 				v->WQueue.push_back(label);
@@ -1847,7 +1855,7 @@ int SLPA::ceateHistogram_selRandMax_qiao_v1(const vector<int>& wordsList)
 	return label;
 }
 
-int SLPA::ceateHistogram_selRandMax_qiao_v2(const vector<int>& wordsList)
+int SLPA::ceateHistogram_selRandMax_qiao_v2(const vector<int>& wordsList, MTrand& mtrand1_s)
 { 	// add random generator into each thread to keep multi-thread safe
 	int label;
 	map<int,int> hist;
@@ -1896,7 +1904,7 @@ int SLPA::ceateHistogram_selRandMax_qiao_v2(const vector<int>& wordsList)
 		// int wind=mtrand1.randInt(cn-1); //**[0~n]
 		//cout<<"*****wind="<<wind<<endl;
 		// int wind = mtrand1s[id].randInt(cn-1);
-		int wind = mtrand1s_h[id].randInt(cn-1);
+		int wind = mtrand1_s.randInt(cn-1);
 		label=pairlist[wind].first;
 	}
 	//cout<<"cn="<<cn<<endl;
