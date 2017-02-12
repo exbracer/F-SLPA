@@ -1847,7 +1847,7 @@ int SLPA::ceateHistogram_selRandMax_qiao_v1(const vector<int>& wordsList)
 	return label;
 }
 
-int SLPA::ceateHistogram_selRandMax_qiao_v1(const vector<int>& wordsList)
+int SLPA::ceateHistogram_selRandMax_qiao_v2(const vector<int>& wordsList)
 { 	// add random generator into each thread to keep multi-thread safe
 	int label;
 	map<int,int> hist;
