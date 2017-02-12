@@ -1034,7 +1034,7 @@ void SLPA::GLPA_asyn_pointer_omp_v1(){
 	// map<int,NODE *>::iterator mit;
 
 	//t=1 because we initialize the WQ(t=0)
-	cout<<"Start iteration:";
+	// cout<<"Start iteration:";
 
 	for(int t=1;t<maxT;t++){
 		//1.shuffle
@@ -1093,8 +1093,8 @@ void SLPA::GLPA_asyn_pointer_omp_v1(){
 		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
 	} // end of for(int t=1; t<maxT; t++)
 
-	cout<<endl;
-	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
+	// cout<<endl;
+	// cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
 } // end of SLPA::GLPA_asyn_pointer_omp()
 
 void SLPA::GLPA_asyn_pointer_omp_v2(){
@@ -1111,7 +1111,7 @@ void SLPA::GLPA_asyn_pointer_omp_v2(){
 	// map<int,NODE *>::iterator mit;
 
 	//t=1 because we initialize the WQ(t=0)
-	cout<<"Start iteration:";
+	// cout<<"Start iteration:";
 
 	for(int t=1;t<maxT;t++){
 		//1.shuffle
@@ -1160,8 +1160,8 @@ void SLPA::GLPA_asyn_pointer_omp_v2(){
 		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
 	} // end of for(int t=1; t<maxT; t++)
 
-	cout<<endl;
-	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
+	// cout<<endl;
+	// cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
 } // end of SLPA::GLPA_asyn_pointer_omp_v2()
 
 void SLPA::GLPA_asyn_pointer_omp_v3(){
@@ -1175,12 +1175,11 @@ void SLPA::GLPA_asyn_pointer_omp_v3(){
 	int labels[net->N];
 	//vector<int> nbWs;
 	vector<int> nbWs[numThreads];
-	vector<int> * nbWs;
-	nbWs = new vec
+	// vector<int> * nbWs;
 	// map<int,NODE *>::iterator mit;
 
 	//t=1 because we initialize the WQ(t=0)
-	cout<<"Start iteration:";
+	// cout<<"Start iteration:";
 
 	#pragma omp parallel num_threads(numThreads) shared(nbWs)
 	{
@@ -1240,8 +1239,8 @@ void SLPA::GLPA_asyn_pointer_omp_v3(){
 		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
 	} // end of for(int t=1; t<maxT; t++)
 	} // end of #pragma omp parallel 	
-	cout<<endl;
-	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
+	// cout<<endl;
+	// cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
 } // end of SLPA::GLPA_asyn_pointer_omp_v3()
 
 void SLPA::GLPA_asyn_pointer_omp_v4(){
@@ -1255,12 +1254,11 @@ void SLPA::GLPA_asyn_pointer_omp_v4(){
 	// int labels[net->N];
 	//vector<int> nbWs;
 	vector<int> nbWs[numThreads];
-	vector<int> * nbWs;
-	nbWs = new vec
+	// vector<int> * nbWs;
 	// map<int,NODE *>::iterator mit;
 
 	//t=1 because we initialize the WQ(t=0)
-	cout<<"Start iteration:";
+	// cout<<"Start iteration:";
 
 	#pragma omp parallel num_threads(numThreads) shared(nbWs)
 	{
@@ -1314,8 +1312,8 @@ void SLPA::GLPA_asyn_pointer_omp_v4(){
 		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
 	} // end of for(int t=1; t<maxT; t++)
 	} // end of #pragma omp parallel 	
-	cout<<endl;
-	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
+	// cout<<endl;
+	// cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
 } // end of SLPA::GLPA_asyn_pointer_omp_v4()
 
 
@@ -1331,7 +1329,7 @@ void SLPA::GLPA_asyn_pointer_time(){
 	map<int,NODE *>::iterator mit;
 
 	//t=1 because we initialize the WQ(t=0)
-	cout<<"Start iteration:";
+	// cout<<"Start iteration:";
 
 	for(int t=1;t<maxT;t++){
 		//1.shuffle
@@ -1386,8 +1384,8 @@ void SLPA::GLPA_asyn_pointer_time(){
 	}
 	cout << endl;
 
-	cout<<endl;
-	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
+	// cout<<endl;
+	// cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
 } // end of SLPA::GLPA_asyn_pointer_time()
 
 void SLPA::GLPA_asyn_pointer_qiao_v1(){
