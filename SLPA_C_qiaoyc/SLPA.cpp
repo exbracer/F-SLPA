@@ -1348,7 +1348,7 @@ void SLPA::GLPA_asyn_pointer_omp_v5(){
 	// NODE *v,*nbv;
 	// int label;
 	// int labels[net->N];
-	labels_h = new int[net->N]；
+	labels_h = new int[net->N];
 	//vector<int> nbWs;
 	// vector<int> nbWs[numThreads];
 	// vector<int> * nbWs;
