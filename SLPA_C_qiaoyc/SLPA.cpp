@@ -2014,7 +2014,7 @@ void SLPA::SetWQueueSize()
 	NODE * v;
 	for (int i = 0; i < net->N; i ++)
 	{
-		v = NODES[i];
+		v = net->NODES[i];
 		v->WQueue.reserve(maxT);
 	}
 }
