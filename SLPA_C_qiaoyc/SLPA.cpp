@@ -1956,10 +1956,11 @@ void SLPA::GLPA_asyn_pointer_qiao_v3(){
 					if (nbWs_s.count(key) > 0)
 					{
 						mit = nbWs_s.find(key);
-						int count = mit->second + 1;
+						mit->second += 1;
+						// int count = mit->second + 1;
 
-						nbWs_s.erase(mit);
-						nbWs_s.insert(pair<int, int>(key, count));
+						// nbWs_s.erase(mit);
+						// nbWs_s.insert(pair<int, int>(key, count));
 					}
 					else
 					{
@@ -2053,10 +2054,11 @@ void SLPA::GLPA_asyn_pointer_qiao_v4(){
 					if (nbWs_s.count(key) > 0)
 					{
 						mit = nbWs_s.find(key);
-						int count = mit->second + 1;
+						mit->second += 1;
+						// int count = mit->second + 1;
 
-						nbWs_s.erase(mit);
-						nbWs_s.insert(pair<int, int>(key, count));
+						// nbWs_s.erase(mit);
+						// nbWs_s.insert(pair<int, int>(key, count));
 					}
 					else
 					{
