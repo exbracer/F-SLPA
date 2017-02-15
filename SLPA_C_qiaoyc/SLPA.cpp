@@ -1867,7 +1867,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v2(){
 			}
 
 			//2. do one iteration-asyn
-			#pragma omp for schedule(dynamic) 
+			#pragma omp for schedule(guided) 
 			for(int i=0;i<net->N;i++)
 			{
 				v=net->NODES[i];
