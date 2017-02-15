@@ -139,6 +139,7 @@ public:
 	void GLPA_asyn_pointer_qiao_v2(); // modified version by qiao_yuchen with openmp, multi-threads out of outer for-loop, shared variables on heap while private on each thread's own stack in syncrhonized way
 	void GLPA_asyn_pointer_qiao_v3(); // modified version by qiao_yuchen based on version 2, change we to construct the map of nbWs_s
 	void GLPA_asyn_pointer_qiao_v4(); // modified version by qiao_yuchen based on version 3, using selectMostFrequentLable_v3, not v2
+	void GLPA_asyn_pointer_qiao_v5(); // modified version by qiao_yuchen based on version 4, using selectMostFrequentLable_v4, not v3
 
 	int selectMostFrequentLabel_v1(map<int, int>& labelsList);
 	int selectMostFrequentLabel_v2(map<int, int>& labelsList, MTRand& mtrand1_s); // use multi random generator and put them on heap
