@@ -1011,9 +1011,17 @@ void SLPA::start_qiao_v1(){
 			{
 				GLPA_asyn_pointer_qiao_v1();
 			}
-			else if(version == 22)
+			else if (version == 22)
 			{
 				GLPA_asyn_pointer_qiao_v2();
+			}
+			else if (version == 23)
+			{
+				GLPA_asyn_pointer_qiao_v3();
+			}
+			else if (version == 24)
+			{
+				GLPA_asyn_pointer_qiao_v4();
 			}
 			
 		}
