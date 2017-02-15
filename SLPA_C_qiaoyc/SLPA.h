@@ -21,6 +21,9 @@
 #include <unordered_map>
 #include "MersenneTwister.h"
 
+#include <hash_map>
+#include <hash_set>
+
 
 //---------------------------
 //		Multi-threading
@@ -130,6 +133,7 @@ public:
 	void GLPA_asyn_pointer_omp_v6(); // add openmp on original code, multi-threads out of outer for-loop, shared variables on heap while private on each thread's own stack in non-synchronized way
 	void GLPA_asyn_pointer_omp_v7(); // add openmp on original code, multi-threads out of outer for-loop, shared variables on heap while private on each thread's own stack， reduce memory allocate times for length variation of vector in synchronized way 
 	
+	void GLPA_asyn_pointer_qiao_v0(); // modified version by qiao_yuchen, serial version
 	void GLPA_asyn_pointer_qiao_v1(); // modified version by qiao_yuchen
 	void GLPA_asyn_pointer_qiao_v2(); // modified version by qiao_yuchen with openmp
 

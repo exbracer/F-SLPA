@@ -1003,7 +1003,11 @@ void SLPA::start_qiao_v1(){
 		}
 		else{
 			// GLPA_asyn_pointer();
-			if (version == 21)
+			if (version == 20)
+			{
+				GLPA_asyn_pointer_qiao_v0();
+			}
+			else if (version == 21)
 			{
 				GLPA_asyn_pointer_qiao_v1();
 			}
@@ -1673,7 +1677,7 @@ void SLPA::GLPA_asyn_pointer_time(){
 	// cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
 } // end of SLPA::GLPA_asyn_pointer_time()
 
-void SLPA::GLPA_asyn_pointer_qiao_v1(){
+void SLPA::GLPA_asyn_pointer_qiao_v0(){
 	//pointer version:
 	//	 store the pointer of nb in *nbList_P*
 	//   save time for retrieving hashTable
@@ -1688,12 +1692,12 @@ void SLPA::GLPA_asyn_pointer_qiao_v1(){
 	map<int,NODE *>::iterator mit;
 
 	//t=1 because we initialize the WQ(t=0)
-	cout<<"Start iteration:";
+	// cout<<"Start iteration:";
 
 	for(int t=1;t<maxT;t++){
 		//1.shuffle
 		//cout<<"-------------t="<<t<<"---------------------"<<endl;
-		cout<<"*"<<flush;
+		// cout<<"*"<<flush;
 		// srand (time(NULL)); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
 		srand(19920403);
 		random_shuffle (net->NODES.begin(), net->NODES.end());
@@ -1725,19 +1729,12 @@ void SLPA::GLPA_asyn_pointer_qiao_v1(){
 			
 		}
 	}
-	v = net->NODES[43];
-	cout << endl;
-	for (int i = 0; i < v->WQueue.size(); i ++)
-	{
-		cout << v->WQueue[i] << ' ';
-	}
-	cout << endl;
+	
+	// cout<<endl;
+	// cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
+} // end of SLPA::GLPA
 
-	cout<<endl;
-	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
-}
-
-void SLPA::GLPA_asyn_pointer_qiao_v2(){
+void SLPA::GLPA_asyn_pointer_qiao_v1(){
 	//pointer version:
 	//	 store the pointer of nb in *nbList_P*
 	//   save time for retrieving hashTable
@@ -1751,12 +1748,12 @@ void SLPA::GLPA_asyn_pointer_qiao_v2(){
 	map<int,NODE *>::iterator mit;
 
 	//t=1 because we initialize the WQ(t=0)
-	cout<<"Start iteration:";
+	// cout<<"Start iteration:";
 
 	for(int t=1;t<maxT;t++){
 		//1.shuffle
 		//cout<<"-------------t="<<t<<"---------------------"<<endl;
-		cout<<"*"<<flush;
+		// cout<<"*"<<flush;
 		// srand (time(NULL)); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
 		srand(19920403);
 		random_shuffle (net->NODES.begin(), net->NODES.end());
@@ -1799,20 +1796,20 @@ void SLPA::GLPA_asyn_pointer_qiao_v2(){
 				}
 				*/
 			}
-			/*	
+				
 			#pragma omp for schedule(static) private(v) 
 			for (int i = 0; i < net->N; i ++)
 			{
 				v = net->NODES[i];
 				v->WQueue.push_back(labels[i]);
 			}
-			*/	
+				
 		}
 		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
 	}
 
-	cout<<endl;
-	cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
+	// cout<<endl;
+	// cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
 }
 
 int SLPA::selectMostFrequentLabel_v1(map<int, int>& labelsList)
