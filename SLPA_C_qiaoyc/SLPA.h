@@ -24,6 +24,7 @@
 #include <hash_map>
 #include <hash_set>
 
+using namespace __gnu_cxx;
 
 //---------------------------
 //		Multi-threading
