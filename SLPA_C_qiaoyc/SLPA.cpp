@@ -1955,7 +1955,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v3(){
 					//nbWs_s[nbv->WQueue[mtrand2_s.randInt(nbv->WQueue.size()-1)]] += 1;
 					// if (nbWs_s.count(key) > 0)
 					mit = nbWs_s.find(key);
-					if (mit != NULL)
+					if (mit != nbWs_s.end())
 					{
 						mit = nbWs_s.find(key);
 						mit->second += 1;
@@ -2055,7 +2055,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v4(){
 					//nbWs_s[nbv->WQueue[mtrand2_s.randInt(nbv->WQueue.size()-1)]] += 1;
 					// if (nbWs_s.count(key) > 0)
 					mit = nbWs_s.find(key);
-					if (mit != NULL)
+					if (mit != nbWs_s.end())
 					{
 						mit = nbWs_s.find(key);
 						mit->second += 1;
@@ -2155,7 +2155,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v5(){
 					//nbWs_s[nbv->WQueue[mtrand2_s.randInt(nbv->WQueue.size()-1)]] += 1;
 					// if (nbWs_s.count(key) > 0)
 					mit = nbWs_s.find(key);
-					if (mit != NULL)
+					if (mit != nbWs_s.end())
 					{
 						mit = nbWs_s.find(key);
 						mit->second += 1;
