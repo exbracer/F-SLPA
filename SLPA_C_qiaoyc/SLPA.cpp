@@ -2126,7 +2126,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v5(){
 	{
 		NODE *v, *nbv;
 		//vector<int> nbWs_s;
-		hash_map<int, int> nbWs_s;
+		hash_map<int, int> nbWs_s(1000);
 		MTRand mtrand1_s = MTRand(2010011248);
 		MTRand mtrand2_s = MTRand(2014210880);
 		hash_map<int, int>::iterator mit;
