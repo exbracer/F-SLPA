@@ -2231,7 +2231,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v6(){
 		MTRand mtrand2_s = MTRand(2014210880);
 		map<int, int>::iterator mit;
 		vector<int> mostLabelsList_s;
-		vector<int> wordsList_s;
+		vector<pari<int, int>> wordsList_s;
 
 		mostLabelsList_s.reserve(1000);
 		wordsList_s.reserve(1000);

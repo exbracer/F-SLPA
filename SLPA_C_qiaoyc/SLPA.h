@@ -146,7 +146,7 @@ public:
 	int selectMostFrequentLabel_v2(map<int, int>& labelsList, MTRand& mtrand1_s); // use multi random generator and put them on heap
 	int selectMostFrequentLabel_v3(map<int, int>& labelsList, MTRand& mtrand1_s, vector<int>& mostLabelsList);
 	int selectMostFrequentLabel_v4(hash_map<int, int>& labelsList, MTRand& mtrand1_s, vector<int>& mostLabelsList);
-	int selectMostFrequentLabel_v5(map<int, int>& labelsList, MTRand& mtrand1_s, vector<int>& wordsList, vector<int>& mostLabelsList);
+	int selectMostFrequentLabel_v5(map<int, int>& labelsList, MTRand& mtrand1_s, vector<pari<int, int>>& wordsList, vector<int>& mostLabelsList);
 
 	int ceateHistogram_selRandMax_qiao_v1(const vector<int>& wordsList); // use multi random generator
 	int ceateHistogram_selRandMax_qiao_v2(const vector<int>& wordsList, MTRand& mtrand1_s); // use multi random generator and put them on heap
