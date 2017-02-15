@@ -2173,7 +2173,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v5(){
 
 				//b.select one of the most frequent label
 				// label=ceateHistogram_selRandMax(nbWs);
-				labels_h[i] = selectMostFrequentLabel_v3(nbWs_s, mtrand1_s, mostLabelsList_s);
+				labels_h[i] = selectMostFrequentLabel_v4(nbWs_s, mtrand1_s, mostLabelsList_s);
 
 				//c. update the WQ **IMMEDIATELY**
 				// v->WQueue.push_back(label);
