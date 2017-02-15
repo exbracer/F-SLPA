@@ -1732,7 +1732,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v0(){
 	
 	// cout<<endl;
 	// cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
-} // end of SLPA::GLPA
+} // end of SLPA::GLPA_asyn_pointer_qiao_v0()
 
 void SLPA::GLPA_asyn_pointer_qiao_v1(){
 	//pointer version:
@@ -1810,7 +1810,85 @@ void SLPA::GLPA_asyn_pointer_qiao_v1(){
 
 	// cout<<endl;
 	// cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
-}
+} // end of SLPA::GLPA_asyn_pointer_qiao_v1()
+
+void SLPA::GLPA_asyn_pointer_qiao_v2(){
+	//pointer version:
+	//	 store the pointer of nb in *nbList_P*
+	//   save time for retrieving hashTable
+	time_t st=time(NULL);
+
+	// NODE *v,*nbv;
+	// int label;
+
+	int labels[net->N];
+	
+	map<int,NODE *>::iterator mit;
+
+	//t=1 because we initialize the WQ(t=0)
+	// cout<<"Start iteration:";
+
+	for(int t=1;t<maxT;t++){
+		//1.shuffle
+		//cout<<"-------------t="<<t<<"---------------------"<<endl;
+		// cout<<"*"<<flush;
+		// srand (time(NULL)); // ***YOU need to use this, such that you can get a new one each time!!!!! seed the random number with the system clock
+		srand(19920403);
+		random_shuffle (net->NODES.begin(), net->NODES.end());
+		//net->showVertices();
+
+
+		//2. do one iteration-asyn
+
+		#pragma omp parallel num_threads(numThreads) 
+		{
+			NODE *v, *nbv;
+			map<int, int> nbWs;
+
+			#pragma omp for schedule(dynamic) private(v, nbv, nbWs) 
+			for(int i=0;i<net->N;i++)
+			{
+				v=net->NODES[i];
+				//a.collect labels from nbs
+				nbWs.clear();
+
+				for(int j=0;j<v->numNbs;j++)
+				{
+					nbv=v->nbList_P[j];
+					// nbWs.push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
+					
+					nbWs[nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]] += 1;
+
+				}
+
+				//b.select one of the most frequent label
+				// label=ceateHistogram_selRandMax(nbWs);
+				labels[i] = selectMostFrequentLabel_v1(nbWs);
+
+				//c. update the WQ **IMMEDIATELY**
+				// v->WQueue.push_back(label);
+				/*
+				#pragma omp critical
+				{
+					v->WQueue.push_back(labels[i]);
+				}
+				*/
+			}
+				
+			#pragma omp for schedule(static) private(v) 
+			for (int i = 0; i < net->N; i ++)
+			{
+				v = net->NODES[i];
+				v->WQueue.push_back(labels[i]);
+			}
+				
+		}
+		//cout<<" Take :" <<difftime(time(NULL),st)<< " seconds."<<endl;
+	}
+
+	// cout<<endl;
+	// cout<<"Iteration is over (takes "<<difftime(time(NULL),st)<< " seconds)"<<endl;
+} // end of SLPA::GLPA_asyn_pointer_qiao_v2()
 
 int SLPA::selectMostFrequentLabel_v1(map<int, int>& labelsList)
 {
@@ -1849,6 +1927,7 @@ int SLPA::selectMostFrequentLabel_v1(map<int, int>& labelsList)
 
 	return label;
 }
+
 
 int SLPA::selectMostFrequentLabel_v2(map<int, int>& labelsList, vector<int>& mostLabelsList)
 {
