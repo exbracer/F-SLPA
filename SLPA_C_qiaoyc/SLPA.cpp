@@ -1003,6 +1003,7 @@ void SLPA::start_qiao_v1(){
 		}
 		else{
 			// GLPA_asyn_pointer();
+			SetWQueueSize();
 			if (version == 20)
 			{
 				GLPA_asyn_pointer_qiao_v0();
@@ -1867,7 +1868,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v2(){
 			}
 
 			//2. do one iteration-asyn
-			#pragma omp for schedule(guided) 
+			#pragma omp for schedule(dynamic) 
 			for(int i=0;i<net->N;i++)
 			{
 				v=net->NODES[i];
