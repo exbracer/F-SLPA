@@ -2480,11 +2480,11 @@ int SLPA::selectMostFrequentLabel_v5(map<int, int>& labelsList, MTRand& mtrand1_
 		{
 			maximum = wordsList[i].second;
 			mostLabelsList.clear();
-			mostLabelsList.push_back(wordsList.first);
+			mostLabelsList.push_back(wordsList[i].first);
 		}
 		else if (wordsList[i].second == maximum)
 		{
-			mostLabelsList.push_back(wordsList.first);
+			mostLabelsList.push_back(wordsList[i].first);
 		}
 	}
 
