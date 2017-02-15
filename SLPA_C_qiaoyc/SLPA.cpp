@@ -1855,20 +1855,20 @@ void SLPA::GLPA_asyn_pointer_qiao_v2(){
 			{
 				v=net->NODES[i];
 				//a.collect labels from nbs
-				nbWs.clear();
+				nbWs_s.clear();
 
 				for(int j=0;j<v->numNbs;j++)
 				{
 					nbv=v->nbList_P[j];
 					// nbWs.push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
 					
-					nbWs[nbv->WQueue[mtrand2_s.randInt(nbv->WQueue.size()-1)]] += 1;
+					nbWs_s[nbv->WQueue[mtrand2_s.randInt(nbv->WQueue.size()-1)]] += 1;
 
 				}
 
 				//b.select one of the most frequent label
 				// label=ceateHistogram_selRandMax(nbWs);
-				labels[i] = selectMostFrequentLabel_v2(nbWs_s, mtrand1_s);
+				labels_h[i] = selectMostFrequentLabel_v2(nbWs_s, mtrand1_s);
 
 				//c. update the WQ **IMMEDIATELY**
 				// v->WQueue.push_back(label);
@@ -1878,7 +1878,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v2(){
 			for (int i = 0; i < net->N; i ++)
 			{
 				v = net->NODES[i];
-				v->WQueue.push_back(labels[i]);
+				v->WQueue.push_back(labels_h[i]);
 			}
 				
 		} // end of for (int i = 0; i < net->N; i ++)
@@ -1934,20 +1934,20 @@ void SLPA::GLPA_asyn_pointer_qiao_v3(){
 			{
 				v=net->NODES[i];
 				//a.collect labels from nbs
-				nbWs.clear();
+				nbWs_s.clear();
 
 				for(int j=0;j<v->numNbs;j++)
 				{
 					nbv=v->nbList_P[j];
 					// nbWs.push_back(nbv->WQueue[mtrand2.randInt(nbv->WQueue.size()-1)]);
 					
-					nbWs[nbv->WQueue[mtrand2_s.randInt(nbv->WQueue.size()-1)]] += 1;
+					nbWs_s[nbv->WQueue[mtrand2_s.randInt(nbv->WQueue.size()-1)]] += 1;
 
 				}
 
 				//b.select one of the most frequent label
 				// label=ceateHistogram_selRandMax(nbWs);
-				labels[i] = selectMostFrequentLabel_v2(nbWs_s, mtrand1_s);
+				labels_h[i] = selectMostFrequentLabel_v2(nbWs_s, mtrand1_s);
 
 				//c. update the WQ **IMMEDIATELY**
 				// v->WQueue.push_back(label);
@@ -1957,7 +1957,7 @@ void SLPA::GLPA_asyn_pointer_qiao_v3(){
 			for (int i = 0; i < net->N; i ++)
 			{
 				v = net->NODES[i];
-				v->WQueue.push_back(labels[i]);
+				v->WQueue.push_back(labels_h[i]);
 			}
 				
 		} // end of for (int i = 0; i < net->N; i ++)
@@ -2046,11 +2046,11 @@ int SLPA::selectMostFrequentLabel_v2(map<int, int>& labelsList, MTRand& mtrand1_
 	return label;
 }
 
-int SLPA::selectMostFrequentLabel_v3(map<int, int>& labelsList, MTRand& mtrand1_s)
+int SLPA::selectMostFrequentLabel_v3(map<int, int>& labelsList, MTRand& mtrand1_s, vector<int>& mostLabelsList)
 {
 	int label;
 	int maximum = 0;
-	vector<int> mostLabelsList;
+	// vector<int> mostLabelsList;
 	map<int, int>::iterator mit;
 
 	for (mit = labelsList.begin(); mit != labelsList.end(); mit ++)
