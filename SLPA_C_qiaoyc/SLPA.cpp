@@ -1023,6 +1023,10 @@ void SLPA::start_qiao_v1(){
 			{
 				GLPA_asyn_pointer_qiao_v4();
 			}
+			else if (version == 25)
+			{
+				GLPA_asyn_pointer_qiao_v5();
+			}
 			
 		}
 		gettimeofday(&end, NULL);
