@@ -2460,7 +2460,7 @@ int SLPA::selectMostFrequentLabel_v4(hash_map<int, int>& labelsList, MTRand& mtr
 	return label;
 } // SLPA::selectMostFrequentLabel_v4
 
-int SLPA::selectMostFrequentLabel_v5(map<int, int>& labelsList, MTRand& mtrand1_s, vector<pari<int, int>>& wordsList, vector<int>& mostLabelsList)
+int SLPA::selectMostFrequentLabel_v5(map<int, int>& labelsList, MTRand& mtrand1_s, vector<pair<int, int>>& wordsList, vector<int>& mostLabelsList)
 {
 	int label;
 	int maximum = 0;
