@@ -68,7 +68,7 @@ do
 				cat $LOG_FILE
 				resultPath1=$resultPath
 				resultPath1+=$UNDERLINE
-				resultPath1+=RUNTIME_LOG
+				resultPath1+=$LOG_FILE
 
 				mv ./$LOG_FILE $resultPath1
 			done
