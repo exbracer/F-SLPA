@@ -48,7 +48,7 @@ EXECUTABLE_FILE=(
 UNDERLINE=_
 datasetPath=
 maxT=MAX_T
-RUNTIME_LOG=runtime.log
+LOG_FILE=runtime.log
 echo START!
 
 for exec in ${EXECUTABLE_FILE[*]}
