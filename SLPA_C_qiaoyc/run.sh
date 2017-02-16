@@ -47,7 +47,7 @@ EXECUTABLE_FILE=(
 # const
 UNDERLINE=_
 datasetPath=
-maxT=MAX_T
+maxT=$MAX_T
 LOG_FILE=runtime.log
 echo START!
 
